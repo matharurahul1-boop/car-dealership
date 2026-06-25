@@ -94,7 +94,7 @@
         "options": {}
       },
       "id": "5bc5e985-4274-4be1-90c7-730e148616e7",
-      "name": "Gemini AI",
+      "name": "Groq AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [1280, 0],
@@ -105,7 +105,7 @@
     },
     {
       "parameters": {
-        "jsCode": "try {\n  const raw = $('Gemini AI').first().json;\n\n  if (!raw.choices || !raw.choices[0] || !raw.choices[0].message) {\n    return [{ json: { message: \"I'm a bit busy right now, please send your message again! 🙏\", booking: null, hasBooking: false, stage: 'error' } }];\n  }\n\n  const responseText = raw.choices[0].message.content || '';\n  let parsed;\n\n  try {\n    parsed = JSON.parse(responseText);\n  } catch(e) {\n    const match = responseText.match(/\\{[\\s\\S]*\\}/);\n    if (match) {\n      try { parsed = JSON.parse(match[0]); }\n      catch(e2) { return [{ json: { message: responseText.replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim(), booking: null, hasBooking: false, stage: 'other' } }]; }\n    } else {\n      return [{ json: { message: responseText.replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim(), booking: null, hasBooking: false, stage: 'other' } }];\n    }\n  }\n\n  const message = (parsed.message || \"Sorry, I couldn't process that. Please try again!\")\n    .replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim();\n\n  const booking = parsed.booking || null;\n  const currentMsg = ($('Check Message Type').first().json.message || '').toLowerCase().trim();\n\n  const greetingWords = ['hi','hello','hey','hii','helo','namaste','hola','sup','yo','hai'];\n  const isPureGreeting = greetingWords.includes(currentMsg);\n\n  const noBookingPhrases = [\n    'was booking', 'kya booking', 'booking done', 'booking hua', 'booking huyi',\n    'book ho gayi', 'book hua', 'book huyi', 'check booking', 'booking ho gayi',\n    'pahle booking', 'pichhli booking', 'previous booking', 'booking check',\n    'kya pichhli', 'booking huyi thi', 'was my booking', 'is my booking',\n    'booking status', 'meri booking', 'booking confirm hui'\n  ];\n\n  const isSafetyBlock = isPureGreeting || noBookingPhrases.some(phrase => currentMsg.includes(phrase));\n  const hasBooking = !isSafetyBlock && !!(booking && booking.car && booking.date && booking.time);\n\n  return [{ json: { message, booking: hasBooking ? booking : null, hasBooking, stage: parsed.stage || 'other' } }];\n\n} catch(e) {\n  return [{ json: { message: \"Sorry, something went wrong. Please try again!\", booking: null, hasBooking: false, stage: 'error' } }];\n}"
+        "jsCode": "try {\n  const raw = $('Groq AI').first().json;\n\n  if (!raw.choices || !raw.choices[0] || !raw.choices[0].message) {\n    return [{ json: { message: \"I'm a bit busy right now, please send your message again! 🙏\", booking: null, hasBooking: false, stage: 'error' } }];\n  }\n\n  const responseText = raw.choices[0].message.content || '';\n  let parsed;\n\n  try {\n    parsed = JSON.parse(responseText);\n  } catch(e) {\n    const match = responseText.match(/\\{[\\s\\S]*\\}/);\n    if (match) {\n      try { parsed = JSON.parse(match[0]); }\n      catch(e2) { return [{ json: { message: responseText.replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim(), booking: null, hasBooking: false, stage: 'other' } }]; }\n    } else {\n      return [{ json: { message: responseText.replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim(), booking: null, hasBooking: false, stage: 'other' } }];\n    }\n  }\n\n  const message = (parsed.message || \"Sorry, I couldn't process that. Please try again!\")\n    .replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim();\n\n  const booking = parsed.booking || null;\n  const currentMsg = ($('Check Message Type').first().json.message || '').toLowerCase().trim();\n\n  const greetingWords = ['hi','hello','hey','hii','helo','namaste','hola','sup','yo','hai'];\n  const isPureGreeting = greetingWords.includes(currentMsg);\n\n  const noBookingPhrases = [\n    'was booking', 'kya booking', 'booking done', 'booking hua', 'booking huyi',\n    'book ho gayi', 'book hua', 'book huyi', 'check booking', 'booking ho gayi',\n    'pahle booking', 'pichhli booking', 'previous booking', 'booking check',\n    'kya pichhli', 'booking huyi thi', 'was my booking', 'is my booking',\n    'booking status', 'meri booking', 'booking confirm hui'\n  ];\n\n  const isSafetyBlock = isPureGreeting || noBookingPhrases.some(phrase => currentMsg.includes(phrase));\n  const hasBooking = !isSafetyBlock && !!(booking && booking.car && booking.date && booking.time);\n\n  return [{ json: { message, booking: hasBooking ? booking : null, hasBooking, stage: parsed.stage || 'other' } }];\n\n} catch(e) {\n  return [{ json: { message: \"Sorry, something went wrong. Please try again!\", booking: null, hasBooking: false, stage: 'error' } }];\n}"
       },
       "id": "7661d3f1-fc71-4b26-bb4b-f4715df77df5",
       "name": "Parse Response",
@@ -259,8 +259,8 @@
       ]
     },
     "Get History": { "main": [[{ "node": "Build Gemini Request", "type": "main", "index": 0 }]] },
-    "Build Gemini Request": { "main": [[{ "node": "Gemini AI", "type": "main", "index": 0 }]] },
-    "Gemini AI": { "main": [[{ "node": "Parse Response", "type": "main", "index": 0 }]] },
+    "Build Gemini Request": { "main": [[{ "node": "Groq AI", "type": "main", "index": 0 }]] },
+    "Groq AI": { "main": [[{ "node": "Parse Response", "type": "main", "index": 0 }]] },
     "Parse Response": { "main": [[{ "node": "Save History", "type": "main", "index": 0 }]] },
     "Save History": { "main": [[{ "node": "Has Booking?", "type": "main", "index": 0 }]] },
     "Has Booking?": {
