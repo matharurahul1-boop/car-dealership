@@ -24,7 +24,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const messageId = $json.body.entry[0].changes[0].value.messages[0].id;\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.processedMessages) staticData.processedMessages = {};\n\nconst now = Date.now();\nfor (const id in staticData.processedMessages) {\n  if (now - staticData.processedMessages[id] > 3600000) {\n    delete staticData.processedMessages[id];\n  }\n}\n\nif (staticData.processedMessages[messageId]) {\n  return [];\n}\n\nstaticData.processedMessages[messageId] = now;\nreturn [$input.first()];"
+        "jsCode": "try {\n  const value = $json.body?.entry?.[0]?.changes?.[0]?.value;\n  if (!value || value.statuses || !value.messages || !value.messages[0]) return [];\n  \n  const messageId = value.messages[0].id;\n  if (!messageId) return [];\n\n  const staticData = $getWorkflowStaticData('global');\n  if (!staticData.processedMessages) staticData.processedMessages = {};\n\n  const now = Date.now();\n  for (const id in staticData.processedMessages) {\n    if (now - staticData.processedMessages[id] > 3600000) {\n      delete staticData.processedMessages[id];\n    }\n  }\n\n  if (staticData.processedMessages[messageId]) return [];\n\n  staticData.processedMessages[messageId] = now;\n  return [$input.first()];\n} catch(e) {\n  return [];\n}"
       },
       "id": "dedup-0001-0001-0001-000000000001",
       "name": "Deduplicate Message",
