@@ -12,15 +12,12 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 1 },
-          "combinator": "and",
-          "conditions": [{ "operator": { "type": "string", "operation": "notEmpty" }, "leftValue": "={{ $json.body.entry[0].changes[0].value.messages ? $json.body.entry[0].changes[0].value.messages[0].id : '' }}", "rightValue": "" }]
-        },
-        "options": {}
+        "jsCode": "const value = $json.body?.entry?.[0]?.changes?.[0]?.value;\nif (!value) return [];\nif (value.statuses) return [];\nif (!value.messages || !value.messages[0] || !value.messages[0].id) return [];\nif (value.messages[0].from === value.metadata?.phone_number_id) return [];\nreturn [$input.first()];"
       },
       "id": "12a3e1e7-0b8c-4c3f-9bf3-e97ecda2e646",
       "name": "Only Incoming Messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2,
       "position": [224, 0]
