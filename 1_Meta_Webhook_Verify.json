@@ -1,0 +1,35 @@
+{
+  "name": "Meta Webhook Verify",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "whatsapp-webhook",
+        "options": {},
+        "responseMode": "responseNode"
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000001",
+      "name": "Webhook GET",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}"
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000002",
+      "name": "Return Challenge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [240, 0]
+    }
+  ],
+  "connections": {
+    "Webhook GET": {
+      "main": [[{ "node": "Return Challenge", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

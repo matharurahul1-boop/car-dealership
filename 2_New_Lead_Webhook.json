@@ -1,0 +1,61 @@
+{
+  "name": "New Lead Webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0002-0001-0001-000000000001",
+      "name": "New Lead Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v25.0/1069159539605344/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAHBaq2bWnkBO4uPUqMxCVOzu0L4o6WKvmegOFxXZAhsZCZAkPe5nnEPiqmNRWbTvQy4cjBZATj4okWlgyTfxvAqCiqSrLXj7YN5atdfzgvSVWZCjKpD9rrVb99UbZCNRB0cz5lWn9hP7zU6XNGLc9Gr8TuFBoyl5lfOttWpPRPAQljz3RHnG9fDYiV9cYkXhCRgZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.body.phone }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Hi {{ $json.body.name }}! 👋 Thank you for your interest in Handysolver Car Dealership 🚗\\n\\nI'm your personal car consultant. Whether you're looking for a hatchback, sedan, SUV, or luxury car — we have it all!\\n\\nJust reply to this message and I'll help you find your dream car. 😊\\n\\n_Handysolver Car Dealership_\"\n  }\n}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0002-0001-0001-000000000002",
+      "name": "Send WhatsApp Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "url": "=https://script.google.com/macros/s/AKfycbzoYisQi9UxCYe7NBypqS3jQTAWOkGgfvyLF09Rkb_XX34AN6MTfbQpsbZk03uIpLCs/exec?action=markSent&phone={{ $('New Lead Trigger').item.json.body.phone }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0002-0001-0001-000000000003",
+      "name": "Mark as Sent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 0]
+    }
+  ],
+  "connections": {
+    "New Lead Trigger": {
+      "main": [[{ "node": "Send WhatsApp Message", "type": "main", "index": 0 }]]
+    },
+    "Send WhatsApp Message": {
+      "main": [[{ "node": "Mark as Sent", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

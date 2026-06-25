@@ -1,0 +1,277 @@
+{
+  "name": "WhatsApp Reply Handler",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "whatsapp-webhook", "options": {} },
+      "id": "48e60ead-2512-496a-afb7-9f5e98936d89",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "339a3fc7-2e85-4623-8166-5cd972d35989"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 1 },
+          "combinator": "and",
+          "conditions": [{ "operator": { "type": "string", "operation": "notEmpty" }, "leftValue": "={{ $json.body.entry[0].changes[0].value.messages ? $json.body.entry[0].changes[0].value.messages[0].id : '' }}", "rightValue": "" }]
+        },
+        "options": {}
+      },
+      "id": "12a3e1e7-0b8c-4c3f-9bf3-e97ecda2e646",
+      "name": "Only Incoming Messages",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [224, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const entry = $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value;\nconst message = entry.messages[0];\nconst messageType = message.type;\nconst phone = message.from;\n\nif (messageType !== 'text') {\n  return [{\n    json: {\n      isText: false,\n      phone: phone,\n      type: messageType,\n      reply: \"Sorry, I can only process text messages right now. 😊 Please type your query and I'll be happy to help!\"\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    isText: true,\n    phone: phone,\n    type: 'text',\n    message: message.text.body\n  }\n}];"
+      },
+      "id": "99258def-1a74-49c7-9595-aff4d07131f3",
+      "name": "Check Message Type",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [432, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 3 },
+          "conditions": [{ "id": "6f66543c-654b-4334-8483-be233f64bf51", "leftValue": "={{ $json.isText }}", "rightValue": "", "operator": { "type": "boolean", "operation": "true", "singleValue": true } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f8a9c66a-fa98-4c8b-874c-f32b4eba9c5e",
+      "name": "Is Text Message?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [640, 0]
+    },
+    {
+      "parameters": {
+        "url": "https://script.google.com/macros/s/AKfycbzoYisQi9UxCYe7NBypqS3jQTAWOkGgfvyLF09Rkb_XX34AN6MTfbQpsbZk03uIpLCs/exec",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "action", "value": "getHistory" },
+            { "name": "phone", "value": "={{ $json.body.entry[0].changes[0].value.messages[0].from }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "abc05790-8d9c-4c5c-a218-f020cf349c77",
+      "name": "Get History",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [848, 0],
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const phone = $('Check Message Type').first().json.phone;\nconst currentMessage = $('Check Message Type').first().json.message;\n\nconst names = ['Raj','Priya','Amit','Neha','Rahul','Pooja','Vikram','Anjali'];\nconst nameIndex = phone.split('').reduce((sum,c) => sum+c.charCodeAt(0),0) % names.length;\nconst agentName = names[nameIndex];\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.conversations) staticData.conversations = {};\nif (!staticData.lastBookings) staticData.lastBookings = {};\n\nconst history = (staticData.conversations[phone] || [])\n  .filter(m => m.message && m.message.trim().length > 0)\n  .slice(-10);\n\nlet budget = '', carInterest = '', bookingStage = 'initial';\nconst historyText = history.map(m => m.message).join(' ').toLowerCase();\nconst bm = historyText.match(/(\\d+[\\s]*(?:lakh|lac|k|thousand|crore))/);\nif (bm) budget = bm[0];\nconst carBrands = ['maruti','swift','baleno','dzire','wagon','alto','celerio','ignis','ertiga','brezza','vitara','xl6','ciaz','spresso','honda','city','amaze','elevate','jazz','hyundai','creta','i20','venue','verna','aura','alcazar','tucson','ioniq','kona','tata','nexon','harrier','safari','punch','altroz','tiago','tigor','curvv','mahindra','scorpio','xuv','bolero','thar','marazzo','toyota','innova','fortuner','glanza','hyryder','kia','seltos','sonet','carens','ev6','volkswagen','virtus','taigun','skoda','slavia','kushaq','mg','hector','astor','windsor','comet','zsev','jeep','compass','meridian','wrangler','renault','kiger','kwid','triber','duster','nissan','magnite','kicks','bmw','audi','mercedes','volvo','lexus','jaguar','land rover','porsche','citroen','isuzu','byd','force'];\nfor (const b of carBrands) { if (historyText.includes(b)) { carInterest = b; break; } }\nif (historyText.includes('test drive') || historyText.includes('book')) bookingStage = 'booking';\nelse if (historyText.includes('price') || historyText.includes('cost') || historyText.includes('budget')) bookingStage = 'qualification';\nelse if (history.length > 0) bookingStage = 'conversation';\n\nconst isFirstMessage = history.length === 0;\n\nconst today = new Date();\nconst todayStr = today.toLocaleDateString('en-IN', {\n  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',\n  timeZone: 'Asia/Kolkata'\n});\n\nconst lastBooking = staticData.lastBookings[phone];\nconst lastBookingInfo = lastBooking\n  ? `CUSTOMER'S LAST CONFIRMED BOOKING: Car = ${lastBooking.car}, Date = ${lastBooking.date}, Time = ${lastBooking.time}. Use this when customer asks about their booking status.`\n  : `No previous booking on record for this customer.`;\n\nconst greetingWords = ['hi','hello','hey','hii','helo','namaste','hola','sup','yo','hai','hei'];\nconst isPureGreeting = greetingWords.includes(currentMessage.trim().toLowerCase());\n\nconst systemPrompt = `You are ${agentName}, a friendly sales agent at Handysolver Car Dealership.\nToday is ${todayStr}.\n\n${lastBookingInfo}\n\nCRITICAL RULES:\n1. ${isFirstMessage ? `FIRST message — say: \"Hi! I'm ${agentName} from Handysolver Car Dealership 🚗 Welcome! How can I help you today?\"` : `NOT first message. NEVER say hello or re-introduce yourself. Continue naturally.`}\n2. Context: Budget=${budget||'not mentioned'}, Car Interest=${carInterest||'not mentioned'}, Stage=${bookingStage}\n3. SHORT replies (2-4 lines). Conversational. No bullet points unless listing cars.\n4. Respond in same language as customer (Hindi/Hinglish/English).\n5. ${isPureGreeting ? `OVERRIDE EVERYTHING: Customer sent a greeting. Reply ONLY: \"Hello! How can I help you today? 😊\" — Nothing about test drive or cars unless they ask. Return booking: {\"car\":null,\"date\":null,\"time\":null} and stage: \"other\".` : `If customer sends only a greeting (hi/hello/hey/namaste) — respond warmly and ask how you can help. Do NOT jump to test drive or booking.`}\n\nINVENTORY:\nWe are a multi-brand dealership stocking ALL popular cars available in India across every segment and brand — Maruti Suzuki, Hyundai, Tata, Honda, Kia, Toyota, Mahindra, MG, Skoda, Volkswagen, Renault, Nissan, Jeep, Citroen, Isuzu, BYD, BMW, Audi, Mercedes-Benz, Volvo, and more. New and used cars both available.\n\nPRICE RANGES BY SEGMENT:\n- Hatchbacks: ₹3.5L–11L (Alto, Swift, i20, Altroz, Baleno, Wagon R, Tiago, Kwid etc.)\n- Micro SUVs: ₹6L–15L (Punch, Magnite, Kiger, XUV 3XO etc.)\n- Sedans: ₹6.5L–19L (Dzire, City, Verna, Amaze, Slavia, Virtus etc.)\n- Compact SUVs: ₹8L–22L (Nexon, Brezza, Venue, Sonet, Elevate, Kushaq, Taigun, Compass etc.)\n- Mid SUVs: ₹11L–25L (Creta, Seltos, Alcazar, Hector, Astor, Grand Vitara etc.)\n- Large SUVs: ₹13L–40L (Harrier, Safari, Scorpio N, Thar, Fortuner, Tucson etc.)\n- MPVs: ₹6L–30L (Ertiga, Carens, Innova Crysta, Innova HyCross, XL6, Triber etc.)\n- Electric: ₹7L–65L+ (Tiago EV, Punch EV, Nexon EV, Windsor EV, ZS EV, Ioniq 5, EV6, BYD Atto 3 etc.)\n- Luxury: ₹45L–2Cr+ (BMW, Audi, Mercedes, Volvo, Jaguar, Porsche etc.)\n- Used Cars: Starting ₹2L\n\nINVENTORY RULE: Since we stock all popular Indian cars, NEVER say a car is unavailable unless it is not sold in India at all. Use your knowledge of Indian car prices and variants to answer accurately. EMI, exchange, and insurance available on all cars.\n\nBOOKING RULES:\n6. Set booking.car, booking.date, booking.time to non-null ONLY when customer provides ALL THREE in their CURRENT message — car model + specific date (DD-MM-YYYY) + time slot.\n7. When customer agrees to test drive → ask: \"Perfect! What date works for you, and what time? We're available any time between 9am–9pm 😊\"\n8. When customer gives relative date (tomorrow, next Monday etc.) → calculate exact date from today (${todayStr}) and confirm.\n9. CONFIRMATION: Any affirmative response counts as YES — yes, haan, ok, sure, absolutely, correct, right, exactly, perfect, definitely, of course, bilkul, theek hai, yep, yup, ha.\n10. booking.date must ALWAYS be in DD-MM-YYYY format.\n11. If date is in the past → say \"That date has passed! Could you pick a future date? 😊\"\n\nSTATUS & REPEAT SCENARIOS:\n12. Status questions → use LAST CONFIRMED BOOKING info to answer.\n13. Cancel request → say \"I'll have our team cancel your booking. They'll contact you shortly.\"\n14. Reschedule request → ask for new date/time only.\n\nCUSTOMER HANDLING:\n15. Angry/frustrated → \"I completely understand your frustration, and I'm sorry for the inconvenience. 🙏\"\n16. Off-topic → \"Ha ha! I wish I could help with that 😄 But I'm your car expert!\"\n17. Budget under ₹3L → suggest used cars starting ₹2L.\n18. NEVER say \"Let me check\" or \"I'll look up\" — answer confidently.\n19. Business hours 9am–9pm. Outside hours → ask for a slot between 9am–9pm.\n\nOUTPUT RULES — CRITICAL:\n- Return valid JSON only. No extra text.\n- Format: {\"message\":\"reply here\",\"stage\":\"initial|qualification|recommendation|booking|confirmed|other\",\"booking\":{\"car\":null,\"date\":null,\"time\":null}}\n- stage = \"confirmed\" ONLY when setting all three booking fields to non-null.\n- booking.time format: \"9am\", \"10am\", \"11am\", \"12pm\", \"1pm\" etc. NEVER 24-hour format.\n- For ALL other messages booking must be: {\"car\":null,\"date\":null,\"time\":null}`;\n\nconst messages = [{ role: 'system', content: systemPrompt }];\nfor (const msg of history) {\n  messages.push({ role: msg.role === 'assistant' ? 'assistant' : 'user', content: msg.message });\n}\nmessages.push({ role: 'user', content: currentMessage });\n\nreturn [{\n  json: {\n    model: \"llama-3.1-8b-instant\",\n    messages: messages,\n    temperature: 0.3,\n    max_tokens: 300,\n    response_format: { type: \"json_object\" }\n  }\n}];"
+      },
+      "id": "2b5dad6b-95ff-4fa6-aac9-5f1b20c179dc",
+      "name": "Build Gemini Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1056, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Authorization", "value": "Bearer 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" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($('Build Gemini Request').item.json) }}",
+        "options": {}
+      },
+      "id": "5bc5e985-4274-4be1-90c7-730e148616e7",
+      "name": "Gemini AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1280, 0],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const raw = $('Gemini AI').first().json;\n\n  if (!raw.choices || !raw.choices[0] || !raw.choices[0].message) {\n    return [{ json: { message: \"I'm a bit busy right now, please send your message again! 🙏\", booking: null, hasBooking: false, stage: 'error' } }];\n  }\n\n  const responseText = raw.choices[0].message.content || '';\n  let parsed;\n\n  try {\n    parsed = JSON.parse(responseText);\n  } catch(e) {\n    const match = responseText.match(/\\{[\\s\\S]*\\}/);\n    if (match) {\n      try { parsed = JSON.parse(match[0]); }\n      catch(e2) { return [{ json: { message: responseText.replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim(), booking: null, hasBooking: false, stage: 'other' } }]; }\n    } else {\n      return [{ json: { message: responseText.replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim(), booking: null, hasBooking: false, stage: 'other' } }];\n    }\n  }\n\n  const message = (parsed.message || \"Sorry, I couldn't process that. Please try again!\")\n    .replace(/[\\x00-\\x1F\\x7F]/g, ' ').replace(/\\s+/g, ' ').trim();\n\n  const booking = parsed.booking || null;\n  const currentMsg = ($('Check Message Type').first().json.message || '').toLowerCase().trim();\n\n  const greetingWords = ['hi','hello','hey','hii','helo','namaste','hola','sup','yo','hai'];\n  const isPureGreeting = greetingWords.includes(currentMsg);\n\n  const noBookingPhrases = [\n    'was booking', 'kya booking', 'booking done', 'booking hua', 'booking huyi',\n    'book ho gayi', 'book hua', 'book huyi', 'check booking', 'booking ho gayi',\n    'pahle booking', 'pichhli booking', 'previous booking', 'booking check',\n    'kya pichhli', 'booking huyi thi', 'was my booking', 'is my booking',\n    'booking status', 'meri booking', 'booking confirm hui'\n  ];\n\n  const isSafetyBlock = isPureGreeting || noBookingPhrases.some(phrase => currentMsg.includes(phrase));\n  const hasBooking = !isSafetyBlock && !!(booking && booking.car && booking.date && booking.time);\n\n  return [{ json: { message, booking: hasBooking ? booking : null, hasBooking, stage: parsed.stage || 'other' } }];\n\n} catch(e) {\n  return [{ json: { message: \"Sorry, something went wrong. Please try again!\", booking: null, hasBooking: false, stage: 'error' } }];\n}"
+      },
+      "id": "7661d3f1-fc71-4b26-bb4b-f4715df77df5",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1488, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const phone = $('Check Message Type').first().json.phone;\nconst userMessage = $('Check Message Type').first().json.message;\nconst aiResponse = $('Parse Response').first().json.message;\nconst stage = $('Parse Response').first().json.stage;\nconst booking = $('Parse Response').first().json.booking;\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.conversations) staticData.conversations = {};\nif (!staticData.lastBookings) staticData.lastBookings = {};\nif (!staticData.conversations[phone]) staticData.conversations[phone] = [];\n\nstaticData.conversations[phone].push({ role: 'user', message: userMessage });\nstaticData.conversations[phone].push({ role: 'assistant', message: aiResponse });\n\nif (staticData.conversations[phone].length > 40) {\n  staticData.conversations[phone] = staticData.conversations[phone].slice(-40);\n}\n\nif (stage === 'confirmed' && booking && booking.car && booking.date && booking.time) {\n  staticData.lastBookings[phone] = {\n    car: booking.car,\n    date: booking.date,\n    time: booking.time,\n    confirmedAt: new Date().toISOString()\n  };\n  staticData.conversations[phone] = staticData.conversations[phone].slice(-6);\n}\n\nreturn [{ json: { saved: true, historyLength: staticData.conversations[phone].length } }];"
+      },
+      "id": "6e9cfa9e-9fef-41ab-b059-035fb6d2da7f",
+      "name": "Save History",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1696, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 3 },
+          "conditions": [{ "id": "29e70ed5-ad29-4470-a8f4-519afb19a76a", "leftValue": "={{ $('Parse Response').item.json.hasBooking }}", "rightValue": "", "operator": { "type": "boolean", "operation": "true", "singleValue": true } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5eba8799-f13b-4d98-a272-317828a0ad17",
+      "name": "Has Booking?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [1888, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v25.0/{{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.metadata.phone_number_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Authorization", "value": "Bearer EAAHBaq2bWnkBO4uPUqMxCVOzu0L4o6WKvmegOFxXZAhsZCZAkPe5nnEPiqmNRWbTvQy4cjBZATj4okWlgyTfxvAqCiqSrLXj7YN5atdfzgvSVWZCjKpD9rrVb99UbZCNRB0cz5lWn9hP7zU6XNGLc9Gr8TuFBoyl5lfOttWpPRPAQljz3RHnG9fDYiV9cYkXhCRgZDZD" }]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "messaging_product", "value": "whatsapp" },
+            { "name": "to", "value": "={{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.messages[0].from }}" },
+            { "name": "type", "value": "text" },
+            { "name": "text", "value": "={{ ({body: \"Just a moment... ⏳\"}) }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "55a1aa92-fe88-4ddb-a0df-71725779a12f",
+      "name": "Send Processing Msg",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [2176, -16]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://script.google.com/macros/s/AKfycbzoYisQi9UxCYe7NBypqS3jQTAWOkGgfvyLF09Rkb_XX34AN6MTfbQpsbZk03uIpLCs/exec",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"action\": \"saveBooking\",\n  \"name\": \"WA-{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"phone\": \"{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"car\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.car : '' }}\",\n  \"date\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.date : '' }}\",\n  \"time\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.time : '' }}\"\n}",
+        "options": {}
+      },
+      "id": "7618db74-b6d3-4ae3-b3c9-a7ff4ba45bb9",
+      "name": "Save Booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [2448, -16],
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://script.google.com/macros/s/AKfycbzoYisQi9UxCYe7NBypqS3jQTAWOkGgfvyLF09Rkb_XX34AN6MTfbQpsbZk03uIpLCs/exec",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"action\": \"saveConversation\",\n  \"phone\": \"{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"userMessage\": \"{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].text.body }}\",\n  \"aiResponse\": \"{{ $('Parse Response').item.json.message }}\"\n}",
+        "options": {}
+      },
+      "id": "3695a3e0-c5d9-4653-a8bc-ad7e247d9da5",
+      "name": "Save Conversation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [2672, -16],
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v25.0/{{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.metadata.phone_number_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Authorization", "value": "Bearer EAAHBaq2bWnkBO4uPUqMxCVOzu0L4o6WKvmegOFxXZAhsZCZAkPe5nnEPiqmNRWbTvQy4cjBZATj4okWlgyTfxvAqCiqSrLXj7YN5atdfzgvSVWZCjKpD9rrVb99UbZCNRB0cz5lWn9hP7zU6XNGLc9Gr8TuFBoyl5lfOttWpPRPAQljz3RHnG9fDYiV9cYkXhCRgZDZD" }]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "messaging_product", "value": "whatsapp" },
+            { "name": "to", "value": "={{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.messages[0].from }}" },
+            { "name": "type", "value": "text" },
+            { "name": "text", "value": "={{ ({body: $('Parse Response').first().json.message}) }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "aa1272eb-7598-4f20-87d4-6da0c5b92a98",
+      "name": "Send AI Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2336, 256]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v25.0/{{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.metadata.phone_number_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Authorization", "value": "Bearer EAAHBaq2bWnkBO4uPUqMxCVOzu0L4o6WKvmegOFxXZAhsZCZAkPe5nnEPiqmNRWbTvQy4cjBZATj4okWlgyTfxvAqCiqSrLXj7YN5atdfzgvSVWZCjKpD9rrVb99UbZCNRB0cz5lWn9hP7zU6XNGLc9Gr8TuFBoyl5lfOttWpPRPAQljz3RHnG9fDYiV9cYkXhCRgZDZD" }]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "messaging_product", "value": "whatsapp" },
+            { "name": "to", "value": "={{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.messages[0].from }}" },
+            { "name": "type", "value": "text" },
+            { "name": "text", "value": "={{ ({body: \"Sorry, I can only read text messages 😊 Please type your question and I'll help you right away!\"}) }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d1da523a-77de-471a-a0b9-ded447acee22",
+      "name": "Send Non-Text Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [832, 256]
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": { "main": [[{ "node": "Only Incoming Messages", "type": "main", "index": 0 }]] },
+    "Only Incoming Messages": { "main": [[{ "node": "Check Message Type", "type": "main", "index": 0 }]] },
+    "Check Message Type": { "main": [[{ "node": "Is Text Message?", "type": "main", "index": 0 }]] },
+    "Is Text Message?": {
+      "main": [
+        [{ "node": "Get History", "type": "main", "index": 0 }],
+        [{ "node": "Send Non-Text Reply", "type": "main", "index": 0 }]
+      ]
+    },
+    "Get History": { "main": [[{ "node": "Build Gemini Request", "type": "main", "index": 0 }]] },
+    "Build Gemini Request": { "main": [[{ "node": "Gemini AI", "type": "main", "index": 0 }]] },
+    "Gemini AI": { "main": [[{ "node": "Parse Response", "type": "main", "index": 0 }]] },
+    "Parse Response": { "main": [[{ "node": "Save History", "type": "main", "index": 0 }]] },
+    "Save History": { "main": [[{ "node": "Has Booking?", "type": "main", "index": 0 }]] },
+    "Has Booking?": {
+      "main": [
+        [{ "node": "Send Processing Msg", "type": "main", "index": 0 }],
+        [{ "node": "Send AI Reply", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Processing Msg": { "main": [[{ "node": "Save Booking", "type": "main", "index": 0 }]] },
+    "Save Booking": { "main": [[{ "node": "Save Conversation", "type": "main", "index": 0 }]] },
+    "Save Conversation": { "main": [[{ "node": "Send AI Reply", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
