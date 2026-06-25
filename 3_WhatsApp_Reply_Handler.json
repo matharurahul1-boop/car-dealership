@@ -27,6 +27,16 @@
     },
     {
       "parameters": {
+        "jsCode": "const messageId = $json.body.entry[0].changes[0].value.messages[0].id;\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.processedMessages) staticData.processedMessages = {};\n\nconst now = Date.now();\nfor (const id in staticData.processedMessages) {\n  if (now - staticData.processedMessages[id] > 3600000) {\n    delete staticData.processedMessages[id];\n  }\n}\n\nif (staticData.processedMessages[messageId]) {\n  return [];\n}\n\nstaticData.processedMessages[messageId] = now;\nreturn [$input.first()];"
+      },
+      "id": "dedup-0001-0001-0001-000000000001",
+      "name": "Deduplicate Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [336, 0]
+    },
+    {
+      "parameters": {
         "jsCode": "const entry = $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value;\nconst message = entry.messages[0];\nconst messageType = message.type;\nconst phone = message.from;\n\nif (messageType !== 'text') {\n  return [{\n    json: {\n      isText: false,\n      phone: phone,\n      type: messageType,\n      reply: \"Sorry, I can only process text messages right now. 😊 Please type your query and I'll be happy to help!\"\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    isText: true,\n    phone: phone,\n    type: 'text',\n    message: message.text.body\n  }\n}];"
       },
       "id": "99258def-1a74-49c7-9595-aff4d07131f3",
@@ -250,7 +260,8 @@
   ],
   "connections": {
     "WhatsApp Webhook": { "main": [[{ "node": "Only Incoming Messages", "type": "main", "index": 0 }]] },
-    "Only Incoming Messages": { "main": [[{ "node": "Check Message Type", "type": "main", "index": 0 }]] },
+    "Only Incoming Messages": { "main": [[{ "node": "Deduplicate Message", "type": "main", "index": 0 }]] },
+    "Deduplicate Message": { "main": [[{ "node": "Check Message Type", "type": "main", "index": 0 }]] },
     "Check Message Type": { "main": [[{ "node": "Is Text Message?", "type": "main", "index": 0 }]] },
     "Is Text Message?": {
       "main": [
