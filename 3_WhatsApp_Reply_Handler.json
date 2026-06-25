@@ -144,7 +144,7 @@
         "url": "=https://graph.facebook.com/v25.0/{{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.metadata.phone_number_id }}/messages",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [{ "name": "Authorization", "value": "Bearer EAAHBaq2bWnkBO4uPUqMxCVOzu0L4o6WKvmegOFxXZAhsZCZAkPe5nnEPiqmNRWbTvQy4cjBZATj4okWlgyTfxvAqCiqSrLXj7YN5atdfzgvSVWZCjKpD9rrVb99UbZCNRB0cz5lWn9hP7zU6XNGLc9Gr8TuFBoyl5lfOttWpPRPAQljz3RHnG9fDYiV9cYkXhCRgZDZD" }]
+          "parameters": [{ "name": "Authorization", "value": "Bearer EAAXR63I2WKMBR2M9BtISQ284oOvoTPuyD16AjKTQg6MSmWoCJMaQ3gtgZAZAcQZAP1SEDMokWfdmn81gnoRbEAE0USrj8j59zMZC5iNwLsfH87slVxgjZAZCry4AdeL91sfUWoziAs13vZA9UFuZA0AdSppNOdyIKnuzgKjtCz5zzZBzMvkX1qtxIvRPQbTj1HCvvZC5cSawXkxeZCBgsEBRw91LmZBhd95UwcVVtfB2QMJfpRYEhExCmv5xIcJZBmYfw5vrFVckXEZAZCDlf7Jz2wW1oPa" }]
         },
         "sendBody": true,
         "bodyParameters": {
@@ -203,7 +203,7 @@
         "url": "=https://graph.facebook.com/v25.0/{{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.metadata.phone_number_id }}/messages",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [{ "name": "Authorization", "value": "Bearer EAAHBaq2bWnkBO4uPUqMxCVOzu0L4o6WKvmegOFxXZAhsZCZAkPe5nnEPiqmNRWbTvQy4cjBZATj4okWlgyTfxvAqCiqSrLXj7YN5atdfzgvSVWZCjKpD9rrVb99UbZCNRB0cz5lWn9hP7zU6XNGLc9Gr8TuFBoyl5lfOttWpPRPAQljz3RHnG9fDYiV9cYkXhCRgZDZD" }]
+          "parameters": [{ "name": "Authorization", "value": "Bearer EAAXR63I2WKMBR2M9BtISQ284oOvoTPuyD16AjKTQg6MSmWoCJMaQ3gtgZAZAcQZAP1SEDMokWfdmn81gnoRbEAE0USrj8j59zMZC5iNwLsfH87slVxgjZAZCry4AdeL91sfUWoziAs13vZA9UFuZA0AdSppNOdyIKnuzgKjtCz5zzZBzMvkX1qtxIvRPQbTj1HCvvZC5cSawXkxeZCBgsEBRw91LmZBhd95UwcVVtfB2QMJfpRYEhExCmv5xIcJZBmYfw5vrFVckXEZAZCDlf7Jz2wW1oPa" }]
         },
         "sendBody": true,
         "bodyParameters": {
@@ -228,7 +228,7 @@
         "url": "=https://graph.facebook.com/v25.0/{{ $('WhatsApp Webhook').first().json.body.entry[0].changes[0].value.metadata.phone_number_id }}/messages",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [{ "name": "Authorization", "value": "Bearer EAAHBaq2bWnkBO4uPUqMxCVOzu0L4o6WKvmegOFxXZAhsZCZAkPe5nnEPiqmNRWbTvQy4cjBZATj4okWlgyTfxvAqCiqSrLXj7YN5atdfzgvSVWZCjKpD9rrVb99UbZCNRB0cz5lWn9hP7zU6XNGLc9Gr8TuFBoyl5lfOttWpPRPAQljz3RHnG9fDYiV9cYkXhCRgZDZD" }]
+          "parameters": [{ "name": "Authorization", "value": "Bearer EAAXR63I2WKMBR2M9BtISQ284oOvoTPuyD16AjKTQg6MSmWoCJMaQ3gtgZAZAcQZAP1SEDMokWfdmn81gnoRbEAE0USrj8j59zMZC5iNwLsfH87slVxgjZAZCry4AdeL91sfUWoziAs13vZA9UFuZA0AdSppNOdyIKnuzgKjtCz5zzZBzMvkX1qtxIvRPQbTj1HCvvZC5cSawXkxeZCBgsEBRw91LmZBhd95UwcVVtfB2QMJfpRYEhExCmv5xIcJZBmYfw5vrFVckXEZAZCDlf7Jz2wW1oPa" }]
         },
         "sendBody": true,
         "bodyParameters": {
