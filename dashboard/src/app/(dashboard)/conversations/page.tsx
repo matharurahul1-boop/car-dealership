@@ -96,7 +96,7 @@ export default function ConversationsPage() {
           <div className="p-3 border-b border-[var(--border)]">
             <div className="relative">
               <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="w-full pl-8 pr-3 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="w-full pl-8 pr-3 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[var(--bg-input)] text-[var(--text)] placeholder:text-[var(--text-muted)]" />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -171,7 +171,7 @@ export default function ConversationsPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
                 placeholder="Type a message…"
-                className="flex-1 border border-[var(--border)] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                className="flex-1 border border-[var(--border)] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[var(--bg-input)] text-[var(--text)] placeholder:text-[var(--text-muted)]"
               />
               <Button onClick={sendMessage} loading={sending} size="sm" className="rounded-full px-4">
                 <Send size={15} />

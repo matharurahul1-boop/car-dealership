@@ -117,7 +117,7 @@ export default function SettingsPage() {
                   value={testPhone}
                   onChange={(e) => setTestPhone(e.target.value)}
                   placeholder="91XXXXXXXXXX"
-                  className="flex-1 border border-[var(--border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="flex-1 border border-[var(--border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[var(--bg-input)] text-[var(--text)] placeholder:text-[var(--text-muted)]"
                 />
                 <Button variant="secondary" size="sm" onClick={testWhatsApp} loading={testing}>
                   Send Test
