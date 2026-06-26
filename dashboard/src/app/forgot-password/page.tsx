@@ -22,13 +22,22 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false },
-    });
-    setLoading(false);
-    if (error) { setError(error.message); return; }
-    setStep("otp");
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      setLoading(false);
+      if (error) {
+        setError(
+          typeof error.message === "string" && error.message
+            ? error.message
+            : "Failed to send code. Please check your email and try again."
+        );
+        return;
+      }
+      setStep("otp");
+    } catch {
+      setLoading(false);
+      setError("Something went wrong. Please try again.");
+    }
   };
 
   /* ── Step 2: Verify OTP ── */
