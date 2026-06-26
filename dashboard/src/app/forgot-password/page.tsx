@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
     });
     setLoading(false);
     if (error) {
-      setError(error.message || "Failed to send reset link. Please try again.");
+      setError(error.message || error.name || "Failed to send reset link. Please check your email and try again.");
     } else {
       setSent(true);
     }
