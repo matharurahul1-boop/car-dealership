@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // N8N calls this endpoint after every WhatsApp message (inbound + outbound AI reply)
 export async function POST(req: NextRequest) {

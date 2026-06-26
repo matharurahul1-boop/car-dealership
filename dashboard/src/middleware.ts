@@ -21,12 +21,14 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const isLoginPage = request.nextUrl.pathname === "/login";
+  const pathname = request.nextUrl.pathname;
+  const publicPaths = ["/login", "/signup", "/forgot-password", "/reset-password", "/auth/callback"];
+  const isPublic = publicPaths.some((p) => pathname.startsWith(p));
 
-  if (!user && !isLoginPage) {
+  if (!user && !isPublic) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  if (user && isLoginPage) {
+  if (user && (pathname === "/login" || pathname === "/signup")) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
