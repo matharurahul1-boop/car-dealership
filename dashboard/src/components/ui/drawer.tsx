@@ -13,25 +13,24 @@ interface DrawerProps {
 export function Drawer({ open, onClose, title, children, width = "w-[480px]" }: DrawerProps) {
   return (
     <>
-      {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/30 z-40 transition-opacity duration-200",
+          "fixed inset-0 bg-black/40 z-40 transition-opacity duration-200",
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
         onClick={onClose}
       />
-      {/* Panel */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
+          "fixed top-0 right-0 h-full shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
           width,
           open ? "translate-x-0" : "translate-x-full"
         )}
+        style={{ background: "var(--bg-card)", borderLeft: "1px solid var(--border)" }}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--border)" }}>
+          <h2 className="text-lg font-semibold" style={{ color: "var(--text)" }}>{title}</h2>
+          <button onClick={onClose} className="rounded-lg p-1 transition-colors" style={{ color: "var(--text-muted)" }}>
             <X size={20} />
           </button>
         </div>

@@ -3,21 +3,36 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
+import { useTheme } from "@/components/ThemeProvider";
 
 interface LeadsChartProps {
   dailyData: { date: string; count: number }[];
 }
 
 export function LeadsLineChart({ dailyData }: LeadsChartProps) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const gridColor = isDark ? "#374151" : "#f0f0f0";
+  const tickColor = isDark ? "#9ca3af" : "#9ca3af";
+  const tooltipBg = isDark ? "#1f2937" : "#ffffff";
+  const tooltipBorder = isDark ? "#374151" : "#e5e7eb";
+  const tooltipText = isDark ? "#f9fafb" : "#111827";
+
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={dailyData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-        <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#9ca3af" }} tickLine={false} />
-        <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} tickLine={false} axisLine={false} allowDecimals={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+        <XAxis dataKey="date" tick={{ fontSize: 11, fill: tickColor }} tickLine={false} />
+        <YAxis tick={{ fontSize: 11, fill: tickColor }} tickLine={false} axisLine={false} allowDecimals={false} />
         <Tooltip
-          contentStyle={{ borderRadius: "8px", border: "1px solid #e5e7eb", fontSize: "12px" }}
-          labelStyle={{ fontWeight: 600 }}
+          contentStyle={{
+            borderRadius: "8px",
+            border: `1px solid ${tooltipBorder}`,
+            fontSize: "12px",
+            background: tooltipBg,
+            color: tooltipText,
+          }}
+          labelStyle={{ fontWeight: 600, color: tooltipText }}
         />
         <Line
           type="monotone"
@@ -38,6 +53,13 @@ interface StatusChartProps {
 }
 
 export function StatusPieChart({ data }: StatusChartProps) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const tooltipBg = isDark ? "#1f2937" : "#ffffff";
+  const tooltipBorder = isDark ? "#374151" : "#e5e7eb";
+  const tooltipText = isDark ? "#f9fafb" : "#111827";
+  const legendColor = isDark ? "#9ca3af" : "#6b7280";
+
   return (
     <ResponsiveContainer width="100%" height={220}>
       <PieChart>
@@ -55,10 +77,18 @@ export function StatusPieChart({ data }: StatusChartProps) {
           ))}
         </Pie>
         <Legend
-          formatter={(value) => <span style={{ fontSize: "12px", color: "#6b7280" }}>{value}</span>}
+          formatter={(value) => (
+            <span style={{ fontSize: "12px", color: legendColor }}>{value}</span>
+          )}
         />
         <Tooltip
-          contentStyle={{ borderRadius: "8px", border: "1px solid #e5e7eb", fontSize: "12px" }}
+          contentStyle={{
+            borderRadius: "8px",
+            border: `1px solid ${tooltipBorder}`,
+            fontSize: "12px",
+            background: tooltipBg,
+            color: tooltipText,
+          }}
         />
       </PieChart>
     </ResponsiveContainer>

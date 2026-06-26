@@ -1,12 +1,20 @@
 import { cn } from "@/lib/utils";
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse bg-gray-200 rounded-lg", className)} />;
+  return (
+    <div
+      className={cn("animate-pulse rounded-lg", className)}
+      style={{ background: "var(--bg-hover)" }}
+    />
+  );
 }
 
 export function StatsCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+    <div
+      className="rounded-xl border shadow-sm p-6"
+      style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}
+    >
       <div className="flex items-start justify-between">
         <div className="space-y-2 flex-1">
           <Skeleton className="h-4 w-28" />
@@ -21,7 +29,7 @@ export function StatsCardSkeleton() {
 
 export function TableRowSkeleton({ cols = 5 }: { cols?: number }) {
   return (
-    <tr className="border-b border-gray-50">
+    <tr className="border-b" style={{ borderColor: "var(--border)" }}>
       {Array.from({ length: cols }).map((_, i) => (
         <td key={i} className="px-6 py-4">
           <Skeleton className="h-4 w-full max-w-[120px]" />

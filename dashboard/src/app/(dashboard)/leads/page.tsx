@@ -134,7 +134,7 @@ export default function LeadsPage() {
             <button
               key={s}
               onClick={() => { setFilterStatus(s); setPage(1); }}
-              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-[var(--text)]" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-gray-200"}`}
+              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-[var(--text)]" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-[var(--bg-hover)]"}`}
             >
               {s} ({s === "all" ? leads.length : counts[s as LeadStatus] ?? 0})
             </button>

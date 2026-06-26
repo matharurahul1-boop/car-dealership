@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
 interface StatsCardProps {
@@ -21,24 +20,24 @@ export function StatsCard({
   trend,
 }: StatsCardProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+    <div
+      className="rounded-xl border shadow-sm p-6"
+      style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}
+    >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-gray-500 font-medium">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
-          {subtitle && <p className="text-sm text-gray-400 mt-1">{subtitle}</p>}
+          <p className="text-sm font-medium" style={{ color: "var(--text-sub)" }}>{title}</p>
+          <p className="text-3xl font-bold mt-1" style={{ color: "var(--text)" }}>{value}</p>
+          {subtitle && (
+            <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>{subtitle}</p>
+          )}
           {trend && (
-            <p
-              className={cn(
-                "text-xs font-medium mt-2",
-                trend.positive ? "text-green-600" : "text-red-600"
-              )}
-            >
+            <p className={`text-xs font-medium mt-2 ${trend.positive ? "text-green-500" : "text-red-500"}`}>
               {trend.positive ? "↑" : "↓"} {Math.abs(trend.value)}% vs last week
             </p>
           )}
         </div>
-        <div className={cn("p-3 rounded-xl", iconBg)}>
+        <div className={`p-3 rounded-xl ${iconBg}`}>
           <Icon size={22} className={iconColor} />
         </div>
       </div>
