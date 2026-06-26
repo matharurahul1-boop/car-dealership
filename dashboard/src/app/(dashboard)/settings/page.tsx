@@ -4,60 +4,50 @@ import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Copy, ExternalLink } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
+import { CheckCircle, Copy, ExternalLink, Database, MessageCircle, Zap, Github, Bot } from "lucide-react";
 
-function CopyableValue({ label, value, masked }: { label: string; value: string; masked?: boolean }) {
+function CopyRow({ label, value, masked }: { label: string; value: string; masked?: boolean }) {
   const [copied, setCopied] = useState(false);
-
   const copy = () => {
     navigator.clipboard.writeText(value);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const display = masked ? value.slice(0, 8) + "..." + value.slice(-6) : value;
-
+  const display = masked ? value.slice(0, 10) + "••••••••" + value.slice(-4) : value;
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
-      <div>
-        <p className="text-xs text-gray-500 mb-0.5">{label}</p>
-        <p className="text-sm font-mono text-gray-800">{display}</p>
+    <div className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0 gap-4">
+      <div className="min-w-0">
+        <p className="text-xs text-gray-400 mb-0.5">{label}</p>
+        <p className="text-sm font-mono text-gray-800 break-all">{display}</p>
       </div>
-      <button
-        onClick={copy}
-        className="text-gray-400 hover:text-blue-600 transition-colors ml-4"
-        title="Copy"
-      >
-        {copied ? <CheckCircle size={16} className="text-green-500" /> : <Copy size={16} />}
+      <button onClick={copy} className="shrink-0 text-gray-300 hover:text-blue-500 transition-colors" title="Copy">
+        {copied ? <CheckCircle size={15} className="text-green-500" /> : <Copy size={15} />}
       </button>
     </div>
   );
 }
 
+function StatusDot({ ok = true }: { ok?: boolean }) {
+  return <span className={`inline-block w-2 h-2 rounded-full ${ok ? "bg-green-500" : "bg-red-500"}`} />;
+}
+
 export default function SettingsPage() {
+  const { toast } = useToast();
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [testPhone, setTestPhone] = useState("");
 
   const testWhatsApp = async () => {
+    if (!testPhone) { toast("Enter a phone number first", "error"); return; }
     setTesting(true);
-    setTestResult(null);
     try {
       const res = await fetch("/api/whatsapp/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: "919833XXXXXX",
-          message: "Test message from Handysolver Car Dealership dashboard ✅",
-        }),
+        body: JSON.stringify({ to: testPhone, message: "✅ Test message from Handysolver Car Dealership dashboard!" }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        setTestResult({ ok: true, message: "WhatsApp API is working correctly!" });
-      } else {
-        setTestResult({ ok: false, message: JSON.stringify(data.error || data) });
-      }
-    } catch {
-      setTestResult({ ok: false, message: "Network error — check N8N / API status" });
+      if (res.ok) toast("Test message sent successfully!", "success");
+      else toast("Failed — check token or phone number", "error");
     } finally {
       setTesting(false);
     }
@@ -65,54 +55,106 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="Settings" subtitle="Configuration and integrations" />
+      <Header title="Settings" subtitle="Integrations and configuration" />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 max-w-3xl">
+      <div className="flex-1 overflow-y-auto p-6 space-y-5 max-w-3xl">
 
-        {/* WhatsApp Config */}
+        {/* Supabase */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">WhatsApp Cloud API</h2>
-              <Badge variant="success">Active</Badge>
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-green-50 rounded-lg"><Database size={16} className="text-green-600" /></div>
+                <h2 className="font-semibold text-gray-900">Supabase Database</h2>
+              </div>
+              <div className="flex items-center gap-1.5"><StatusDot /><Badge variant="success">Connected</Badge></div>
             </div>
           </CardHeader>
           <CardContent>
-            <CopyableValue label="Phone Number ID" value="1093164003887900" />
-            <CopyableValue
-              label="System User Token (long-lived)"
-              value="EAAXR63I2WKMBR4KQao7Xs1CtKHxnIMT4IUz8jngkz3ZC6NjqR7Bh2btKZCyKYOyFo3uAzj65Pz3KF2sOk1sWBsHRDlXF2WZAcV6PIMRqHtfZByfcBlfTD1m8hO6qQehTNUDbSNVqNwCTToXX3C9wlRtMwhX65XfxhlvX6c3cMTZApb4t1bCe0GA6xSOtKAQZDZD"
-              masked
-            />
-            <CopyableValue label="Test Number" value="+1 (555) 672-2118" />
-            <CopyableValue label="Business Portfolio" value="AutoPrime Car Dealership" />
+            <CopyRow label="Project URL" value="https://bvbwxgxrxqhgaupssqkg.supabase.co" />
+            <CopyRow label="Publishable Key" value="sb_publishable_Qzr62X8ul24lRJn-CFgJ5A_ImTx2XcT" masked />
+            <CopyRow label="Organization" value="matharurahul1-boop's Org · AWS ap-south-1" />
+            <div className="mt-3 pt-3 border-t border-gray-50">
+              <p className="text-xs font-semibold text-gray-500 mb-2">Tables</p>
+              <div className="flex gap-2 flex-wrap">
+                {["leads", "bookings", "messages"].map((t) => (
+                  <code key={t} className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg">{t}</code>
+                ))}
+              </div>
+            </div>
+            <div className="mt-3 pt-1">
+              <a
+                href="https://supabase.com/dashboard/project/bvbwxgxrxqhgaupssqkg/editor"
+                target="_blank" rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+              >
+                Open Table Editor <ExternalLink size={11} />
+              </a>
+            </div>
           </CardContent>
         </Card>
 
-        {/* N8N Config */}
+        {/* WhatsApp */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">N8N Workflows</h2>
-              <Badge variant="info">Render.com</Badge>
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-green-50 rounded-lg"><MessageCircle size={16} className="text-green-600" /></div>
+                <h2 className="font-semibold text-gray-900">WhatsApp Cloud API</h2>
+              </div>
+              <div className="flex items-center gap-1.5"><StatusDot /><Badge variant="success">Active</Badge></div>
             </div>
           </CardHeader>
           <CardContent>
-            <CopyableValue label="N8N Host" value="https://n8n-car-dealership.onrender.com" />
-            <CopyableValue label="New Lead Webhook" value="https://n8n-car-dealership.onrender.com/webhook/new-lead" />
-            <CopyableValue label="WhatsApp Webhook" value="https://n8n-car-dealership.onrender.com/webhook/whatsapp-webhook" />
+            <CopyRow label="Phone Number ID" value="1093164003887900" />
+            <CopyRow label="System User Token (long-lived)" value="EAAXR63I2WKMBR4KQao7Xs1CtKHxnIMT4IUz8jngkz3ZC6NjqR7Bh2btKZCyKYOyFo3uAzj65Pz3KF2sOk1sWBsHRDlXF2WZAcV6PIMRqHtfZByfcBlfTD1m8hO6qQehTNUDbSNVqNwCTToXX3C9wlRtMwhX65XfxhlvX6c3cMTZApb4t1bCe0GA6xSOtKAQZDZD" masked />
+            <CopyRow label="Test Number" value="+1 (555) 672-2118" />
+            <CopyRow label="Business Portfolio" value="AutoPrime Car Dealership" />
+            <div className="mt-4 pt-3 border-t border-gray-50">
+              <p className="text-xs font-semibold text-gray-500 mb-2">Send Test Message</p>
+              <div className="flex gap-2">
+                <input
+                  value={testPhone}
+                  onChange={(e) => setTestPhone(e.target.value)}
+                  placeholder="91XXXXXXXXXX"
+                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <Button variant="secondary" size="sm" onClick={testWhatsApp} loading={testing}>
+                  Send Test
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* N8N */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-orange-50 rounded-lg"><Zap size={16} className="text-orange-500" /></div>
+                <h2 className="font-semibold text-gray-900">N8N Automation</h2>
+              </div>
+              <Badge variant="warning">Render.com</Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <CopyRow label="N8N Host" value="https://n8n-car-dealership.onrender.com" />
+            <CopyRow label="New Lead Webhook" value="https://n8n-car-dealership.onrender.com/webhook/new-lead" />
+            <CopyRow label="WhatsApp Webhook" value="https://n8n-car-dealership.onrender.com/webhook/whatsapp-webhook" />
+            <CopyRow label="Dashboard Message Endpoint" value="/api/n8n/message" />
             <div className="mt-3 pt-3 border-t border-gray-50">
               <p className="text-xs font-semibold text-gray-500 mb-2">Active Workflows</p>
               <div className="space-y-1.5">
                 {[
                   "1. Meta Webhook Verify",
                   "2. New Lead Webhook",
-                  "3. WhatsApp Reply Handler",
-                  "5. Keep Server Warm (10min ping)",
-                  "6. Same Day Reminder (9AM IST)",
+                  "3. WhatsApp Reply Handler (Groq AI)",
+                  "5. Keep Server Warm (every 10 min)",
+                  "6. Same Day Reminder (9 AM IST)",
                 ].map((w) => (
                   <div key={w} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    <StatusDot />
                     <p className="text-sm text-gray-700">{w}</p>
                   </div>
                 ))}
@@ -121,42 +163,18 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Google Sheets Config */}
+        {/* AI */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">Google Apps Script / Sheets</h2>
-              <Badge variant="success">Connected</Badge>
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 bg-purple-50 rounded-lg"><Bot size={16} className="text-purple-600" /></div>
+              <h2 className="font-semibold text-gray-900">AI Configuration</h2>
             </div>
           </CardHeader>
           <CardContent>
-            <CopyableValue
-              label="Apps Script URL"
-              value="https://script.google.com/macros/s/AKfycbzoYisQi9UxCYe7NBypqS3jQTAWOkGgfvyLF09Rkb_XX34AN6MTfbQpsbZk03uIpLCs/exec"
-            />
-            <CopyableValue label="Google Sheet ID" value="1n9c6yjKy7Ylgq9aXREO1Pa4T7-mOkddllIDxznfVDhs" />
-            <div className="mt-3 pt-3 border-t border-gray-50">
-              <p className="text-xs font-semibold text-gray-500 mb-2">Available Actions</p>
-              <div className="flex flex-wrap gap-2">
-                {["getLeads", "addLead", "getAllBookings", "updateBookingStatus", "getConversations", "markSent"].map((a) => (
-                  <code key={a} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                    {a}
-                  </code>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* AI Config */}
-        <Card>
-          <CardHeader>
-            <h2 className="font-semibold text-gray-900">AI Configuration</h2>
-          </CardHeader>
-          <CardContent>
-            <CopyableValue label="Provider" value="Groq" />
-            <CopyableValue label="Model" value="llama-3.1-8b-instant" />
-            <CopyableValue label="API Key" value="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" masked />
+            <CopyRow label="Provider" value="Groq" />
+            <CopyRow label="Model" value="llama-3.1-8b-instant" />
+            <CopyRow label="API Key" value="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" masked />
           </CardContent>
         </Card>
 
@@ -164,45 +182,23 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">GitHub (N8N Workflows)</h2>
-              <a
-                href="https://github.com/matharurahul1-boop/car-dealership"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
-              >
-                View Repo <ExternalLink size={13} />
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-gray-100 rounded-lg"><Github size={16} className="text-gray-700" /></div>
+                <h2 className="font-semibold text-gray-900">GitHub Repository</h2>
+              </div>
+              <a href="https://github.com/matharurahul1-boop/car-dealership" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-xs">
+                View Repo <ExternalLink size={12} />
               </a>
             </div>
           </CardHeader>
           <CardContent>
-            <CopyableValue label="Repository" value="matharurahul1-boop/car-dealership (private)" />
-            <CopyableValue label="Workflows Path" value="n8n/" />
-            <CopyableValue label="Branch" value="master" />
+            <CopyRow label="Repository" value="matharurahul1-boop/car-dealership (private)" />
+            <CopyRow label="N8N Workflows" value="car-dealership/" />
+            <CopyRow label="Dashboard App" value="dashboard/" />
+            <CopyRow label="Branch" value="master" />
           </CardContent>
         </Card>
 
-        {/* Test Panel */}
-        <Card>
-          <CardHeader>
-            <h2 className="font-semibold text-gray-900">Connection Test</h2>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-500 mb-4">
-              Test the WhatsApp API connection. Replace the phone number in the API route with a verified test number before running.
-            </p>
-            <Button onClick={testWhatsApp} loading={testing} variant="secondary">
-              Test WhatsApp API
-            </Button>
-            {testResult && (
-              <div
-                className={`mt-3 p-3 rounded-lg text-sm ${testResult.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
-              >
-                {testResult.message}
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
