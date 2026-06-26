@@ -92,11 +92,11 @@ export default function ConversationsPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <div className="w-72 border-r border-gray-200 bg-white flex flex-col shrink-0">
-          <div className="p-3 border-b border-gray-100">
+        <div className="w-72 border-r border-gray-700 bg-gray-900 flex flex-col shrink-0">
+          <div className="p-3 border-b border-gray-700">
             <div className="relative">
               <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -111,7 +111,7 @@ export default function ConversationsPage() {
               <button
                 key={c.phone}
                 onClick={() => setSelected(c)}
-                className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${selected?.phone === c.phone ? "bg-blue-50 border-l-2 border-l-blue-600" : ""}`}
+                className={`w-full text-left px-4 py-3 border-b border-gray-700 hover:bg-gray-950 transition-colors ${selected?.phone === c.phone ? "bg-blue-50 border-l-2 border-l-blue-600" : ""}`}
               >
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -119,7 +119,7 @@ export default function ConversationsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-center">
-                      <p className="font-medium text-gray-900 text-sm truncate">{c.name}</p>
+                      <p className="font-medium text-white text-sm truncate">{c.name}</p>
                       <p className="text-xs text-gray-400 shrink-0 ml-1">{formatTime(c.lastMessageTime)}</p>
                     </div>
                     <div className="flex justify-between items-center mt-0.5">
@@ -136,12 +136,12 @@ export default function ConversationsPage() {
         {/* Chat area */}
         {selected ? (
           <div className="flex-1 flex flex-col min-w-0">
-            <div className="px-5 py-3 border-b border-gray-200 bg-white flex items-center gap-3">
+            <div className="px-5 py-3 border-b border-gray-700 bg-gray-900 flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
                 {selected.name?.[0]?.toUpperCase() || "?"}
               </div>
               <div>
-                <p className="font-semibold text-gray-900 text-sm">{selected.name}</p>
+                <p className="font-semibold text-white text-sm">{selected.name}</p>
                 <p className="text-xs text-gray-400">{formatPhone(selected.phone)}</p>
               </div>
               <div className="ml-auto flex items-center gap-1.5">
@@ -156,7 +156,7 @@ export default function ConversationsPage() {
               )}
               {selected.messages?.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm ${msg.direction === "outbound" ? "bg-[#dcf8c6] text-gray-900 rounded-br-none" : "bg-white text-gray-900 rounded-bl-none"}`}>
+                  <div className={`max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm ${msg.direction === "outbound" ? "bg-[#dcf8c6] text-white rounded-br-none" : "bg-gray-900 text-white rounded-bl-none"}`}>
                     <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                     <p className="text-xs text-gray-400 mt-1 text-right">{formatTime(msg.timestamp)}</p>
                   </div>
@@ -165,13 +165,13 @@ export default function ConversationsPage() {
               <div ref={bottomRef} />
             </div>
 
-            <div className="px-4 py-3 border-t border-gray-200 bg-white flex items-center gap-3">
+            <div className="px-4 py-3 border-t border-gray-700 bg-gray-900 flex items-center gap-3">
               <input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
                 placeholder="Type a message…"
-                className="flex-1 border border-gray-200 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-1 border border-gray-700 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
               />
               <Button onClick={sendMessage} loading={sending} size="sm" className="rounded-full px-4">
                 <Send size={15} />
@@ -179,7 +179,7 @@ export default function ConversationsPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-gray-50">
+          <div className="flex-1 flex items-center justify-center bg-gray-950">
             <div className="text-center">
               <MessageCircle size={48} className="mx-auto text-gray-200 mb-3" />
               <p className="text-gray-400 text-sm">Select a conversation</p>

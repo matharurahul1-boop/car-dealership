@@ -82,7 +82,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <Card className="lg:col-span-2">
             <CardHeader>
-              <h2 className="font-semibold text-gray-900 text-sm">Leads — Last 14 Days</h2>
+              <h2 className="font-semibold text-white text-sm">Leads — Last 14 Days</h2>
             </CardHeader>
             <CardContent>
               {loading || !stats?.dailyData?.length ? (
@@ -95,7 +95,7 @@ export default function DashboardPage() {
 
           <Card>
             <CardHeader>
-              <h2 className="font-semibold text-gray-900 text-sm">Lead Status Breakdown</h2>
+              <h2 className="font-semibold text-white text-sm">Lead Status Breakdown</h2>
             </CardHeader>
             <CardContent>
               {loading || !stats?.statusData?.length ? (
@@ -111,7 +111,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">Today&apos;s Test Drives</h2>
+              <h2 className="font-semibold text-white">Today&apos;s Test Drives</h2>
               <Badge variant="info">{todayBookings.length} scheduled</Badge>
             </div>
           </CardHeader>
@@ -127,19 +127,19 @@ export default function DashboardPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <tr className="border-b border-gray-700 bg-gray-950/50">
                       {["Customer", "Phone", "Car", "Time", "Status"].map((h) => (
-                        <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
+                        <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {todayBookings.map((b) => (
-                      <tr key={b.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                        <td className="px-6 py-3 font-medium text-gray-900">{b.name}</td>
-                        <td className="px-6 py-3 text-gray-500 font-mono text-xs">{formatPhone(b.phone)}</td>
-                        <td className="px-6 py-3 text-gray-700">{b.car}</td>
-                        <td className="px-6 py-3 font-medium text-gray-700">{b.time}</td>
+                      <tr key={b.id} className="border-b border-gray-700 hover:bg-gray-950/50">
+                        <td className="px-6 py-3 font-medium text-white">{b.name}</td>
+                        <td className="px-6 py-3 text-gray-400 font-mono text-xs">{formatPhone(b.phone)}</td>
+                        <td className="px-6 py-3 text-gray-200">{b.car}</td>
+                        <td className="px-6 py-3 font-medium text-gray-200">{b.time}</td>
                         <td className="px-6 py-3"><Badge variant={statusVariant(b.status)}>{b.status}</Badge></td>
                       </tr>
                     ))}
