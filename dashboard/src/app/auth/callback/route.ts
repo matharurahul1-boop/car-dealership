@@ -21,7 +21,10 @@ export async function GET(request: NextRequest) {
       }
     );
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(`${origin}/dashboard`);
+    if (!error) {
+      const next = searchParams.get("next") || "/dashboard";
+      return NextResponse.redirect(`${origin}${next}`);
+    }
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);

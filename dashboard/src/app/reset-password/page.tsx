@@ -1,14 +1,10 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Car, Lock, CheckCircle, AlertTriangle } from "lucide-react";
 
 export default function ResetPasswordPage() {
-  return <Suspense><ResetPasswordForm /></Suspense>;
-}
-
-function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,25 +13,17 @@ function ResetPasswordForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  /* Exchange the code from the URL for a session */
   useEffect(() => {
-    const code = searchParams.get("code");
-    if (!code) {
-      setError("Invalid or missing reset link. Please request a new one.");
+    supabase.auth.getUser().then(({ data: { user } }) => {
       setVerifying(false);
-      return;
-    }
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      setVerifying(false);
-      if (error) {
-        setError("This reset link has expired or already been used. Please request a new one.");
-      } else {
+      if (user) {
         setSessionReady(true);
+      } else {
+        setError("Invalid or expired reset link. Please request a new one.");
       }
     });
-  }, [searchParams]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +54,7 @@ function ResetPasswordForm() {
 
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 shadow-2xl">
 
-          {/* Verifying link */}
+          {/* Verifying */}
           {verifying && (
             <div className="text-center py-4">
               <svg className="animate-spin h-8 w-8 text-blue-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
@@ -77,7 +65,7 @@ function ResetPasswordForm() {
             </div>
           )}
 
-          {/* Invalid / expired link */}
+          {/* Invalid / expired */}
           {!verifying && !sessionReady && (
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-14 h-14 bg-red-500/20 rounded-2xl mb-4">
