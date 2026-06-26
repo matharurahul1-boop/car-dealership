@@ -16,12 +16,12 @@ function CopyRow({ label, value, masked }: { label: string; value: string; maske
   };
   const display = masked ? value.slice(0, 10) + "••••••••" + value.slice(-4) : value;
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-gray-700 last:border-0 gap-4">
+    <div className="flex items-center justify-between py-2.5 border-b border-[var(--border)] last:border-0 gap-4">
       <div className="min-w-0">
-        <p className="text-xs text-gray-400 mb-0.5">{label}</p>
-        <p className="text-sm font-mono text-gray-100 break-all">{display}</p>
+        <p className="text-xs text-[var(--text-muted)] mb-0.5">{label}</p>
+        <p className="text-sm font-mono text-[var(--text-sub)] break-all">{display}</p>
       </div>
-      <button onClick={copy} className="shrink-0 text-gray-300 hover:text-blue-500 transition-colors" title="Copy">
+      <button onClick={copy} className="shrink-0 text-[var(--text-sub)] hover:text-blue-500 transition-colors" title="Copy">
         {copied ? <CheckCircle size={15} className="text-green-500" /> : <Copy size={15} />}
       </button>
     </div>
@@ -65,7 +65,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-green-50 rounded-lg"><Database size={16} className="text-green-600" /></div>
-                <h2 className="font-semibold text-white">Supabase Database</h2>
+                <h2 className="font-semibold text-[var(--text)]">Supabase Database</h2>
               </div>
               <div className="flex items-center gap-1.5"><StatusDot /><Badge variant="success">Connected</Badge></div>
             </div>
@@ -74,11 +74,11 @@ export default function SettingsPage() {
             <CopyRow label="Project URL" value="https://bvbwxgxrxqhgaupssqkg.supabase.co" />
             <CopyRow label="Publishable Key" value="Stored securely in environment variables" />
             <CopyRow label="Organization" value="matharurahul1-boop's Org · AWS ap-south-1" />
-            <div className="mt-3 pt-3 border-t border-gray-700">
-              <p className="text-xs font-semibold text-gray-400 mb-2">Tables</p>
+            <div className="mt-3 pt-3 border-t border-[var(--border)]">
+              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Tables</p>
               <div className="flex gap-2 flex-wrap">
                 {["leads", "bookings", "messages"].map((t) => (
-                  <code key={t} className="text-xs bg-gray-700 text-gray-200 px-2.5 py-1 rounded-lg">{t}</code>
+                  <code key={t} className="text-xs bg-[var(--bg-muted)] text-[var(--text-sub)] px-2.5 py-1 rounded-lg">{t}</code>
                 ))}
               </div>
             </div>
@@ -100,7 +100,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-green-50 rounded-lg"><MessageCircle size={16} className="text-green-600" /></div>
-                <h2 className="font-semibold text-white">WhatsApp Cloud API</h2>
+                <h2 className="font-semibold text-[var(--text)]">WhatsApp Cloud API</h2>
               </div>
               <div className="flex items-center gap-1.5"><StatusDot /><Badge variant="success">Active</Badge></div>
             </div>
@@ -110,14 +110,14 @@ export default function SettingsPage() {
             <CopyRow label="System User Token (long-lived)" value="Stored securely in environment variables" />
             <CopyRow label="Test Number" value="+1 (555) 672-2118" />
             <CopyRow label="Business Portfolio" value="AutoPrime Car Dealership" />
-            <div className="mt-4 pt-3 border-t border-gray-700">
-              <p className="text-xs font-semibold text-gray-400 mb-2">Send Test Message</p>
+            <div className="mt-4 pt-3 border-t border-[var(--border)]">
+              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Send Test Message</p>
               <div className="flex gap-2">
                 <input
                   value={testPhone}
                   onChange={(e) => setTestPhone(e.target.value)}
                   placeholder="91XXXXXXXXXX"
-                  className="flex-1 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="flex-1 border border-[var(--border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
                 />
                 <Button variant="secondary" size="sm" onClick={testWhatsApp} loading={testing}>
                   Send Test
@@ -133,7 +133,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-orange-50 rounded-lg"><Zap size={16} className="text-orange-500" /></div>
-                <h2 className="font-semibold text-white">N8N Automation</h2>
+                <h2 className="font-semibold text-[var(--text)]">N8N Automation</h2>
               </div>
               <Badge variant="warning">Render.com</Badge>
             </div>
@@ -143,8 +143,8 @@ export default function SettingsPage() {
             <CopyRow label="New Lead Webhook" value="https://n8n-car-dealership.onrender.com/webhook/new-lead" />
             <CopyRow label="WhatsApp Webhook" value="https://n8n-car-dealership.onrender.com/webhook/whatsapp-webhook" />
             <CopyRow label="Dashboard Message Endpoint" value="/api/n8n/message" />
-            <div className="mt-3 pt-3 border-t border-gray-700">
-              <p className="text-xs font-semibold text-gray-400 mb-2">Active Workflows</p>
+            <div className="mt-3 pt-3 border-t border-[var(--border)]">
+              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Active Workflows</p>
               <div className="space-y-1.5">
                 {[
                   "1. Meta Webhook Verify",
@@ -155,7 +155,7 @@ export default function SettingsPage() {
                 ].map((w) => (
                   <div key={w} className="flex items-center gap-2">
                     <StatusDot />
-                    <p className="text-sm text-gray-200">{w}</p>
+                    <p className="text-sm text-[var(--text-sub)]">{w}</p>
                   </div>
                 ))}
               </div>
@@ -168,7 +168,7 @@ export default function SettingsPage() {
           <CardHeader>
             <div className="flex items-center gap-2.5">
               <div className="p-1.5 bg-purple-50 rounded-lg"><Bot size={16} className="text-purple-600" /></div>
-              <h2 className="font-semibold text-white">AI Configuration</h2>
+              <h2 className="font-semibold text-[var(--text)]">AI Configuration</h2>
             </div>
           </CardHeader>
           <CardContent>
@@ -183,8 +183,8 @@ export default function SettingsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-1.5 bg-gray-700 rounded-lg"><Github size={16} className="text-gray-200" /></div>
-                <h2 className="font-semibold text-white">GitHub Repository</h2>
+                <div className="p-1.5 bg-[var(--bg-muted)] rounded-lg"><Github size={16} className="text-[var(--text-sub)]" /></div>
+                <h2 className="font-semibold text-[var(--text)]">GitHub Repository</h2>
               </div>
               <a href="https://github.com/matharurahul1-boop/car-dealership" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-xs">
                 View Repo <ExternalLink size={12} />

@@ -134,7 +134,7 @@ export default function LeadsPage() {
             <button
               key={s}
               onClick={() => { setFilterStatus(s); setPage(1); }}
-              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-200"}`}
+              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-[var(--text)]" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-gray-200"}`}
             >
               {s} ({s === "all" ? leads.length : counts[s as LeadStatus] ?? 0})
             </button>
@@ -144,20 +144,20 @@ export default function LeadsPage() {
         {/* Search */}
         <div className="px-6 pt-3 pb-3">
           <div className="relative max-w-sm">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search name, phone, interest…" className="w-full pl-8 pr-4 py-2 text-sm border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+            <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search name, phone, interest…" className="w-full pl-8 pr-4 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
           </div>
         </div>
 
         {/* Table */}
         <div className="px-6 pb-6">
-          <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-sm overflow-hidden">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border)] shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-700 bg-gray-950/50">
+                  <tr className="border-b border-[var(--border)] bg-[var(--bg)]/50">
                     {["Name", "Phone", "Interest", "Source", "Status", "Created", ""].map((h) => (
-                      <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">{h}</th>
+                      <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -166,33 +166,33 @@ export default function LeadsPage() {
                     Array.from({ length: 6 }).map((_, i) => <TableRowSkeleton key={i} cols={7} />)
                   ) : paginated.length === 0 ? (
                     <tr><td colSpan={7} className="px-6 py-16 text-center">
-                      <UserPlus size={36} className="mx-auto text-gray-200 mb-2" />
-                      <p className="text-gray-400 text-sm">No leads found</p>
+                      <UserPlus size={36} className="mx-auto text-[var(--text-sub)] mb-2" />
+                      <p className="text-[var(--text-muted)] text-sm">No leads found</p>
                     </td></tr>
                   ) : paginated.map((lead) => (
                     <tr
                       key={lead.id}
                       onClick={() => { setSelected(lead); setNotes(lead.notes || ""); }}
-                      className="border-b border-gray-700 hover:bg-blue-50/30 transition-colors cursor-pointer"
+                      className="border-b border-[var(--border)] hover:bg-blue-50/30 transition-colors cursor-pointer"
                     >
-                      <td className="px-6 py-3 font-medium text-white">{lead.name}</td>
-                      <td className="px-6 py-3 text-gray-400 font-mono text-xs">{formatPhone(lead.phone)}</td>
-                      <td className="px-6 py-3 text-gray-200">{lead.interest || "—"}</td>
-                      <td className="px-6 py-3 text-gray-400">{lead.source || "WhatsApp"}</td>
+                      <td className="px-6 py-3 font-medium text-[var(--text)]">{lead.name}</td>
+                      <td className="px-6 py-3 text-[var(--text-muted)] font-mono text-xs">{formatPhone(lead.phone)}</td>
+                      <td className="px-6 py-3 text-[var(--text-sub)]">{lead.interest || "—"}</td>
+                      <td className="px-6 py-3 text-[var(--text-muted)]">{lead.source || "WhatsApp"}</td>
                       <td className="px-6 py-3" onClick={(e) => e.stopPropagation()}>
                         <select
                           value={lead.status}
                           onChange={(e) => updateStatus(lead.id, e.target.value as LeadStatus)}
-                          className="text-xs border border-gray-700 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-900 capitalize"
+                          className="text-xs border border-[var(--border)] rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[var(--bg-card)] capitalize"
                         >
                           {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </td>
-                      <td className="px-6 py-3 text-gray-400 text-xs">
+                      <td className="px-6 py-3 text-[var(--text-muted)] text-xs">
                         {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) : "—"}
                       </td>
                       <td className="px-6 py-3" onClick={(e) => e.stopPropagation()}>
-                        <button onClick={() => deleteLead(lead.id)} className="text-gray-300 hover:text-red-500 transition-colors">
+                        <button onClick={() => deleteLead(lead.id)} className="text-[var(--text-sub)] hover:text-red-500 transition-colors">
                           <Trash2 size={14} />
                         </button>
                       </td>
@@ -204,14 +204,14 @@ export default function LeadsPage() {
 
             {/* Pagination */}
             {!loading && filtered.length > PAGE_SIZE && (
-              <div className="flex items-center justify-between px-6 py-3 border-t border-gray-700 bg-gray-950/30">
-                <p className="text-xs text-gray-400">Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}</p>
+              <div className="flex items-center justify-between px-6 py-3 border-t border-[var(--border)] bg-[var(--bg)]/30">
+                <p className="text-xs text-[var(--text-muted)]">Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}</p>
                 <div className="flex gap-1">
-                  <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 rounded text-gray-400 hover:text-gray-300 hover:bg-gray-800 disabled:opacity-30">
+                  <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 rounded text-[var(--text-muted)] hover:text-[var(--text-sub)] hover:bg-[var(--bg-muted)] disabled:opacity-30">
                     <ChevronLeft size={15} />
                   </button>
-                  <span className="px-3 py-1 text-xs text-gray-300">{page} / {totalPages}</span>
-                  <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-1.5 rounded text-gray-400 hover:text-gray-300 hover:bg-gray-800 disabled:opacity-30">
+                  <span className="px-3 py-1 text-xs text-[var(--text-sub)]">{page} / {totalPages}</span>
+                  <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-1.5 rounded text-[var(--text-muted)] hover:text-[var(--text-sub)] hover:bg-[var(--bg-muted)] disabled:opacity-30">
                     <ChevronRight size={15} />
                   </button>
                 </div>
@@ -226,7 +226,7 @@ export default function LeadsPage() {
         {selected && (
           <div className="p-6 space-y-5">
             {/* Info */}
-            <div className="bg-gray-950 rounded-xl p-4 space-y-3">
+            <div className="bg-[var(--bg)] rounded-xl p-4 space-y-3">
               {[
                 ["Name", selected.name],
                 ["Phone", formatPhone(selected.phone)],
@@ -235,21 +235,21 @@ export default function LeadsPage() {
                 ["Created", selected.createdAt ? new Date(selected.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" }) : "—"],
               ].map(([k, v]) => (
                 <div key={k} className="flex justify-between items-center">
-                  <span className="text-xs text-gray-400 font-medium">{k}</span>
-                  <span className="text-sm text-gray-100 font-medium">{v}</span>
+                  <span className="text-xs text-[var(--text-muted)] font-medium">{k}</span>
+                  <span className="text-sm text-[var(--text-sub)] font-medium">{v}</span>
                 </div>
               ))}
             </div>
 
             {/* Status */}
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Status</p>
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">Status</p>
               <div className="flex flex-wrap gap-2">
                 {STATUS_OPTIONS.map((s) => (
                   <button
                     key={s}
                     onClick={() => updateStatus(selected.id, s)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize border transition-all ${selected.status === s ? "border-blue-600 bg-blue-600 text-white" : "border-gray-700 text-gray-300 hover:border-blue-400"}`}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize border transition-all ${selected.status === s ? "border-blue-600 bg-blue-600 text-[var(--text)]" : "border-[var(--border)] text-[var(--text-sub)] hover:border-blue-400"}`}
                   >
                     {s}
                   </button>
@@ -259,19 +259,19 @@ export default function LeadsPage() {
 
             {/* Notes */}
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Sales Notes</p>
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">Sales Notes</p>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={4}
                 placeholder="Add notes about this lead…"
-                className="w-full text-sm border border-gray-700 rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-none"
+                className="w-full text-sm border border-[var(--border)] rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-none"
               />
               <Button size="sm" onClick={saveNotes} loading={savingNotes} className="mt-2">Save Notes</Button>
             </div>
 
             {/* Danger */}
-            <div className="pt-2 border-t border-gray-700">
+            <div className="pt-2 border-t border-[var(--border)]">
               <Button variant="danger" size="sm" onClick={() => deleteLead(selected.id)}>
                 <Trash2 size={14} /> Delete Lead
               </Button>
@@ -289,7 +289,7 @@ export default function LeadsPage() {
           <Select label="Source" value={form.source} onChange={(e) => setForm((f) => ({ ...f, source: e.target.value }))}>
             <option>WhatsApp</option><option>Website</option><option>Referral</option><option>Walk-in</option><option>Social Media</option>
           </Select>
-          <p className="text-xs text-gray-400">A WhatsApp welcome message will be sent automatically.</p>
+          <p className="text-xs text-[var(--text-muted)]">A WhatsApp welcome message will be sent automatically.</p>
           <div className="flex gap-3 pt-2">
             <Button variant="secondary" onClick={() => setShowModal(false)} className="flex-1">Cancel</Button>
             <Button onClick={addLead} loading={submitting} className="flex-1">Add Lead &amp; Send WhatsApp</Button>

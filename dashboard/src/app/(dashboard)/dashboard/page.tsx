@@ -82,11 +82,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <Card className="lg:col-span-2">
             <CardHeader>
-              <h2 className="font-semibold text-white text-sm">Leads — Last 14 Days</h2>
+              <h2 className="font-semibold text-[var(--text)] text-sm">Leads — Last 14 Days</h2>
             </CardHeader>
             <CardContent>
               {loading || !stats?.dailyData?.length ? (
-                <div className="h-[220px] flex items-center justify-center text-gray-300 text-sm">No data yet</div>
+                <div className="h-[220px] flex items-center justify-center text-[var(--text-sub)] text-sm">No data yet</div>
               ) : (
                 <LeadsLineChart dailyData={stats.dailyData} />
               )}
@@ -95,11 +95,11 @@ export default function DashboardPage() {
 
           <Card>
             <CardHeader>
-              <h2 className="font-semibold text-white text-sm">Lead Status Breakdown</h2>
+              <h2 className="font-semibold text-[var(--text)] text-sm">Lead Status Breakdown</h2>
             </CardHeader>
             <CardContent>
               {loading || !stats?.statusData?.length ? (
-                <div className="h-[220px] flex items-center justify-center text-gray-300 text-sm">No data yet</div>
+                <div className="h-[220px] flex items-center justify-center text-[var(--text-sub)] text-sm">No data yet</div>
               ) : (
                 <StatusPieChart data={stats.statusData} />
               )}
@@ -111,35 +111,35 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-white">Today&apos;s Test Drives</h2>
+              <h2 className="font-semibold text-[var(--text)]">Today&apos;s Test Drives</h2>
               <Badge variant="info">{todayBookings.length} scheduled</Badge>
             </div>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
-              <div className="text-center py-10 text-gray-400 text-sm">Loading…</div>
+              <div className="text-center py-10 text-[var(--text-muted)] text-sm">Loading…</div>
             ) : todayBookings.length === 0 ? (
               <div className="text-center py-10">
-                <Car size={36} className="mx-auto text-gray-200 mb-2" />
-                <p className="text-gray-400 text-sm">No test drives today</p>
+                <Car size={36} className="mx-auto text-[var(--text-sub)] mb-2" />
+                <p className="text-[var(--text-muted)] text-sm">No test drives today</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-700 bg-gray-950/50">
+                    <tr className="border-b border-[var(--border)] bg-[var(--bg)]/50">
                       {["Customer", "Phone", "Car", "Time", "Status"].map((h) => (
-                        <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">{h}</th>
+                        <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {todayBookings.map((b) => (
-                      <tr key={b.id} className="border-b border-gray-700 hover:bg-gray-950/50">
-                        <td className="px-6 py-3 font-medium text-white">{b.name}</td>
-                        <td className="px-6 py-3 text-gray-400 font-mono text-xs">{formatPhone(b.phone)}</td>
-                        <td className="px-6 py-3 text-gray-200">{b.car}</td>
-                        <td className="px-6 py-3 font-medium text-gray-200">{b.time}</td>
+                      <tr key={b.id} className="border-b border-[var(--border)] hover:bg-[var(--bg)]/50">
+                        <td className="px-6 py-3 font-medium text-[var(--text)]">{b.name}</td>
+                        <td className="px-6 py-3 text-[var(--text-muted)] font-mono text-xs">{formatPhone(b.phone)}</td>
+                        <td className="px-6 py-3 text-[var(--text-sub)]">{b.car}</td>
+                        <td className="px-6 py-3 font-medium text-[var(--text-sub)]">{b.time}</td>
                         <td className="px-6 py-3"><Badge variant={statusVariant(b.status)}>{b.status}</Badge></td>
                       </tr>
                     ))}

@@ -117,7 +117,7 @@ export default function BookingsPage() {
       <div className="flex-1 overflow-y-auto">
         <div className="px-6 pt-4 flex gap-2 flex-wrap">
           {(["all", "confirmed", "completed", "cancelled"] as const).map((s) => (
-            <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-200"}`}>
+            <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-[var(--text)]" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-gray-200"}`}>
               {s} ({counts[s]})
             </button>
           ))}
@@ -125,19 +125,19 @@ export default function BookingsPage() {
 
         <div className="px-6 pt-3 pb-3">
           <div className="relative max-w-sm">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, phone, car…" className="w-full pl-8 pr-4 py-2 text-sm border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, phone, car…" className="w-full pl-8 pr-4 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
           </div>
         </div>
 
         <div className="px-6 pb-6">
-          <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-sm overflow-hidden">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border)] shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-700 bg-gray-950/50">
+                  <tr className="border-b border-[var(--border)] bg-[var(--bg)]/50">
                     {["Customer", "Phone", "Car", "Date", "Time", "Status", "Actions"].map((h) => (
-                      <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">{h}</th>
+                      <th key={h} className="text-left px-6 py-3 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -146,16 +146,16 @@ export default function BookingsPage() {
                     Array.from({ length: 5 }).map((_, i) => <TableRowSkeleton key={i} cols={7} />)
                   ) : filtered.length === 0 ? (
                     <tr><td colSpan={7} className="px-6 py-16 text-center">
-                      <CalendarCheck size={36} className="mx-auto text-gray-200 mb-2" />
-                      <p className="text-gray-400 text-sm">No bookings found</p>
+                      <CalendarCheck size={36} className="mx-auto text-[var(--text-sub)] mb-2" />
+                      <p className="text-[var(--text-muted)] text-sm">No bookings found</p>
                     </td></tr>
                   ) : filtered.map((b) => (
-                    <tr key={b.id} className="border-b border-gray-700 hover:bg-gray-950/50 transition-colors">
-                      <td className="px-6 py-3 font-medium text-white">{b.name}</td>
-                      <td className="px-6 py-3 text-gray-400 font-mono text-xs">{formatPhone(b.phone)}</td>
-                      <td className="px-6 py-3 text-gray-200">{b.car}</td>
-                      <td className="px-6 py-3 text-gray-200">{formatDate(b.date)}</td>
-                      <td className="px-6 py-3 font-medium text-gray-200">{b.time}</td>
+                    <tr key={b.id} className="border-b border-[var(--border)] hover:bg-[var(--bg)]/50 transition-colors">
+                      <td className="px-6 py-3 font-medium text-[var(--text)]">{b.name}</td>
+                      <td className="px-6 py-3 text-[var(--text-muted)] font-mono text-xs">{formatPhone(b.phone)}</td>
+                      <td className="px-6 py-3 text-[var(--text-sub)]">{b.car}</td>
+                      <td className="px-6 py-3 text-[var(--text-sub)]">{formatDate(b.date)}</td>
+                      <td className="px-6 py-3 font-medium text-[var(--text-sub)]">{b.time}</td>
                       <td className="px-6 py-3"><Badge variant={statusVariant(b.status)}>{b.status}</Badge></td>
                       <td className="px-6 py-3">
                         <div className="flex gap-2">
