@@ -72,7 +72,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <CopyRow label="Project URL" value="https://bvbwxgxrxqhgaupssqkg.supabase.co" />
-            <CopyRow label="Publishable Key" value="sb_publishable_Qzr62X8ul24lRJn-CFgJ5A_ImTx2XcT" masked />
+            <CopyRow label="Publishable Key" value="Stored securely in environment variables" />
             <CopyRow label="Organization" value="matharurahul1-boop's Org · AWS ap-south-1" />
             <div className="mt-3 pt-3 border-t border-gray-50">
               <p className="text-xs font-semibold text-gray-500 mb-2">Tables</p>
@@ -107,7 +107,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <CopyRow label="Phone Number ID" value="1093164003887900" />
-            <CopyRow label="System User Token (long-lived)" value="EAAXR63I2WKMBR4KQao7Xs1CtKHxnIMT4IUz8jngkz3ZC6NjqR7Bh2btKZCyKYOyFo3uAzj65Pz3KF2sOk1sWBsHRDlXF2WZAcV6PIMRqHtfZByfcBlfTD1m8hO6qQehTNUDbSNVqNwCTToXX3C9wlRtMwhX65XfxhlvX6c3cMTZApb4t1bCe0GA6xSOtKAQZDZD" masked />
+            <CopyRow label="System User Token (long-lived)" value="Stored securely in environment variables" />
             <CopyRow label="Test Number" value="+1 (555) 672-2118" />
             <CopyRow label="Business Portfolio" value="AutoPrime Car Dealership" />
             <div className="mt-4 pt-3 border-t border-gray-50">
@@ -174,7 +174,7 @@ export default function SettingsPage() {
           <CardContent>
             <CopyRow label="Provider" value="Groq" />
             <CopyRow label="Model" value="llama-3.1-8b-instant" />
-            <CopyRow label="API Key" value="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" masked />
+            <CopyRow label="API Key" value="Stored securely in environment variables" />
           </CardContent>
         </Card>
 
