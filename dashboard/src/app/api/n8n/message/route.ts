@@ -32,17 +32,21 @@ export async function POST(req: NextRequest) {
 
   // Save booking if AI collected one
   if (booking?.car && booking?.date && booking?.time) {
-    await supabaseAdmin.from("bookings").upsert(
-      {
-        phone,
-        name: name || phone,
-        car: booking.car,
-        date: booking.date,
-        time: booking.time,
-        status: "confirmed",
-      },
-      { onConflict: "phone" }
-    );
+    // Cancel any existing confirmed bookings for this phone before inserting new one
+    await supabaseAdmin
+      .from("bookings")
+      .update({ status: "cancelled" })
+      .eq("phone", phone)
+      .eq("status", "confirmed");
+
+    await supabaseAdmin.from("bookings").insert({
+      phone,
+      name: name || phone,
+      car: booking.car,
+      date: booking.date,
+      time: booking.time,
+      status: "confirmed",
+    });
 
     // Update lead status to booked
     await supabaseAdmin
