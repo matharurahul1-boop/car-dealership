@@ -123,7 +123,7 @@ export default function SettingsPage() {
             <div className="mt-3 pt-3 border-t border-[var(--border)]">
               <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Tables</p>
               <div className="flex gap-2 flex-wrap">
-                {["leads", "bookings", "messages", "app_settings", "reminders_log"].map((t) => (
+                {["leads", "bookings", "messages", "profiles", "app_settings", "reminders_log"].map((t) => (
                   <code key={t} className="text-xs bg-[var(--bg-muted)] text-[var(--text-sub)] px-2.5 py-1 rounded-lg">{t}</code>
                 ))}
               </div>
@@ -189,18 +189,18 @@ export default function SettingsPage() {
             <CopyRow label="New Lead Webhook" value="https://n8n-car-dealership.onrender.com/webhook/new-lead" />
             <CopyRow label="WhatsApp Webhook" value="https://n8n-car-dealership.onrender.com/webhook/whatsapp-webhook" />
             <CopyRow label="Dashboard Message Endpoint" value="/api/n8n/message" />
-            <CopyRow label="Reminder Cron Endpoint" value="/api/reminders/run (daily 03:00 UTC / 8:30 AM IST)" />
+            <CopyRow label="Phone Check Endpoint" value="/api/n8n/has-messages (auto-reset static data for new phones)" />
+            <CopyRow label="Reminder Endpoint" value="/api/reminders/run (n8n every 30 min · Vercel cron daily 03:00 UTC backup)" />
             <div className="mt-3 pt-3 border-t border-[var(--border)]">
               <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Active Workflows</p>
               <div className="space-y-1.5">
                 {[
                   "1. Meta Webhook Verify",
                   "2. New Lead Webhook",
-                  "3. WhatsApp Reply Handler (Groq AI)",
+                  "3. WhatsApp Reply Handler (Groq AI · llama-3.3-70b-versatile)",
                   "4. Sync to Dashboard (saves leads, messages, bookings)",
                   "5. Keep Server Warm (every 10 min)",
-                  "6. Same Day Reminder (9 AM IST)",
-                  "7. Test Drive Reminder Checker (every 30 min)",
+                  "6. Test Drive Reminder Checker (every 30 min → /api/reminders/run)",
                 ].map((w) => (
                   <div key={w} className="flex items-center gap-2">
                     <StatusDot />
