@@ -305,7 +305,7 @@ export default function SettingsPage() {
                   <Button onClick={saveReminderSettings} loading={savingReminder} size="sm">
                     Save Reminder Settings
                   </Button>
-                  <p className="text-xs text-[var(--text-muted)]">Reminders run automatically every hour via Vercel Cron</p>
+                  <p className="text-xs text-[var(--text-muted)]">Reminders run automatically daily at 8:30 AM IST via Vercel Cron</p>
                 </div>
               </div>
             )}

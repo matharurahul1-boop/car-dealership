@@ -88,10 +88,9 @@ export async function GET() {
 
   const sentIds = new Set((sentLog ?? []).map((r: { booking_id: string }) => r.booking_id));
 
+  // For day-based reminders (>=24h): find bookings on the target date regardless of time
+  // For hour-based reminders (<24h): find bookings within a ±1h window today
   const now = new Date();
-  const windowStart = new Date(now.getTime() + (hoursBefore - 0.5) * 60 * 60 * 1000);
-  const windowEnd = new Date(now.getTime() + (hoursBefore + 0.5) * 60 * 60 * 1000);
-
   const sent: string[] = [];
 
   for (const booking of bookings ?? []) {
@@ -100,18 +99,32 @@ export async function GET() {
     const bookingDate = parseBookingDate(booking.date);
     if (!bookingDate) continue;
 
-    const bookingTime = parseBookingTime(booking.time);
-    if (!bookingTime) continue;
+    let shouldSend = false;
 
-    const bookingDateTime = new Date(
-      bookingDate.getFullYear(),
-      bookingDate.getMonth(),
-      bookingDate.getDate(),
-      bookingTime.hours,
-      bookingTime.minutes
-    );
+    if (hoursBefore >= 24) {
+      // Check if booking is on the target day (days ahead = hoursBefore / 24, rounded)
+      const daysAhead = Math.round(hoursBefore / 24);
+      const targetDate = new Date(now);
+      targetDate.setDate(targetDate.getDate() + daysAhead);
+      shouldSend =
+        bookingDate.getFullYear() === targetDate.getFullYear() &&
+        bookingDate.getMonth() === targetDate.getMonth() &&
+        bookingDate.getDate() === targetDate.getDate();
+    } else {
+      // Hour-based: check if booking datetime is within ±1h of the reminder window
+      const bookingTime = parseBookingTime(booking.time);
+      if (bookingTime) {
+        const bookingDateTime = new Date(
+          bookingDate.getFullYear(), bookingDate.getMonth(), bookingDate.getDate(),
+          bookingTime.hours, bookingTime.minutes
+        );
+        const windowStart = new Date(now.getTime() + (hoursBefore - 1) * 3600000);
+        const windowEnd = new Date(now.getTime() + (hoursBefore + 1) * 3600000);
+        shouldSend = bookingDateTime >= windowStart && bookingDateTime <= windowEnd;
+      }
+    }
 
-    if (bookingDateTime >= windowStart && bookingDateTime <= windowEnd) {
+    if (shouldSend) {
       const message = messageTemplate
         .replace("{name}", booking.name || booking.phone)
         .replace("{car}", booking.car || "your chosen car")
@@ -128,5 +141,5 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({ sent, count: sent.length, windowStart, windowEnd });
+  return NextResponse.json({ sent, count: sent.length, checkedAt: now.toISOString() });
 }
