@@ -3,10 +3,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   LayoutDashboard, Users, CalendarCheck, MessageCircle,
-  Settings, Car, LogOut, AlertTriangle, ChevronLeft, ChevronRight,
+  Settings, Car, LogOut, AlertTriangle, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 
 const allNavItems = [
@@ -17,16 +17,22 @@ const allNavItems = [
   { href: "/settings",      label: "Settings",       icon: Settings,        roles: ["admin", "manager"] },
 ];
 
+type SidebarMode = "expanded" | "collapsed" | "hover";
+
 export function Sidebar() {
   const pathname = usePathname();
   const [showConfirm, setShowConfirm] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("Admin");
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [collapsed, setCollapsed] = useState(false);
+  const [mode, setMode] = useState<SidebarMode>("expanded");
+  const [hovered, setHovered] = useState(false);
+  const [showModeMenu, setShowModeMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (localStorage.getItem("sidebar-collapsed") === "true") setCollapsed(true);
+    const saved = localStorage.getItem("sidebar-mode") as SidebarMode | null;
+    if (saved) setMode(saved);
   }, []);
 
   useEffect(() => {
@@ -40,12 +46,23 @@ export function Sidebar() {
     });
   }, []);
 
+  // Close mode menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowModeMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const navItems = allNavItems.filter((item) => !item.roles || (userRole && item.roles.includes(userRole)));
 
-  const toggle = () => {
-    const next = !collapsed;
-    setCollapsed(next);
-    localStorage.setItem("sidebar-collapsed", String(next));
+  const setModeAndSave = (m: SidebarMode) => {
+    setMode(m);
+    setShowModeMenu(false);
+    localStorage.setItem("sidebar-mode", m);
   };
 
   const handleLogout = async () => {
@@ -55,39 +72,40 @@ export function Sidebar() {
 
   const initials = userName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "HS";
 
+  // Whether to show labels (expanded content)
+  const expanded = mode === "expanded" || (mode === "hover" && hovered);
+
+  const modeOptions: { key: SidebarMode; label: string }[] = [
+    { key: "expanded",  label: "Expanded" },
+    { key: "collapsed", label: "Collapsed" },
+    { key: "hover",     label: "Expand on hover" },
+  ];
+
   return (
     <>
       {/* Desktop sidebar */}
       <aside
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         className={cn(
-          "hidden min-[900px]:flex flex-col shrink-0 bg-gray-900 border-r border-gray-700 transition-[width] duration-200 overflow-hidden",
-          collapsed ? "w-[60px]" : "w-64"
+          "hidden min-[900px]:flex flex-col shrink-0 bg-gray-900 border-r border-gray-700 overflow-hidden",
+          "transition-[width] duration-200 ease-in-out",
+          expanded ? "w-64" : "w-[60px]"
         )}
       >
-        {/* Logo row */}
-        <div
-          className={cn(
-            "flex items-center h-[70px] border-b border-gray-700 shrink-0",
-            collapsed ? "justify-center" : "px-4 gap-3"
-          )}
-        >
+        {/* Logo */}
+        <div className={cn(
+          "flex items-center h-[70px] border-b border-gray-700 shrink-0 gap-3",
+          expanded ? "px-4" : "justify-center"
+        )}>
           <div className="bg-blue-600 rounded-lg p-2 shrink-0">
             <Car size={18} className="text-white" />
           </div>
-          {!collapsed && (
-            <>
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm leading-tight">Handysolver</p>
-                <p className="text-gray-400 text-xs">Car Dealership</p>
-              </div>
-              <button
-                onClick={toggle}
-                title="Collapse sidebar"
-                className="shrink-0 p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-              >
-                <ChevronLeft size={15} />
-              </button>
-            </>
+          {expanded && (
+            <div className="min-w-0 flex-1">
+              <p className="text-white font-semibold text-sm leading-tight">Handysolver</p>
+              <p className="text-gray-400 text-xs">Car Dealership</p>
+            </div>
           )}
         </div>
 
@@ -99,46 +117,35 @@ export function Sidebar() {
               <Link
                 key={href}
                 href={href}
-                title={collapsed ? label : undefined}
+                title={!expanded ? label : undefined}
                 className={cn(
                   "flex items-center rounded-lg text-sm font-medium transition-colors",
-                  collapsed ? "justify-center p-3" : "gap-3 px-3 py-2.5",
-                  active ? "bg-blue-600 text-white" : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                  expanded ? "gap-3 px-3 py-2.5" : "justify-center p-3",
+                  active
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-400 hover:bg-gray-800 hover:text-white"
                 )}
               >
                 <Icon size={17} strokeWidth={active ? 2.5 : 1.8} />
-                {!collapsed && <span>{label}</span>}
+                {expanded && <span>{label}</span>}
               </Link>
             );
           })}
-
-          {/* Expand button — only shown when collapsed */}
-          {collapsed && (
-            <button
-              onClick={toggle}
-              title="Expand sidebar"
-              className="w-full flex justify-center p-3 mt-1 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800 transition-colors"
-            >
-              <ChevronRight size={16} />
-            </button>
-          )}
         </nav>
 
-        {/* Footer */}
-        <div
-          className={cn(
-            "border-t border-gray-700 shrink-0",
-            collapsed ? "py-3 flex flex-col items-center gap-2 px-2" : "px-4 py-4 space-y-3"
-          )}
-        >
-          <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
+        {/* User footer */}
+        <div className={cn(
+          "border-t border-gray-700 shrink-0",
+          expanded ? "px-4 py-4 space-y-3" : "py-3 px-2 flex flex-col items-center gap-2"
+        )}>
+          <div className={cn("flex items-center gap-3", !expanded && "justify-center")}>
             <div
               className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0"
-              title={collapsed ? `${userName} · ${userEmail}` : undefined}
+              title={!expanded ? `${userName} · ${userEmail}` : undefined}
             >
               {initials}
             </div>
-            {!collapsed && (
+            {expanded && (
               <div className="min-w-0">
                 <p className="text-white text-sm font-medium truncate">{userName}</p>
                 <p className="text-gray-400 text-xs truncate">{userEmail}</p>
@@ -147,17 +154,53 @@ export function Sidebar() {
           </div>
           <button
             onClick={() => setShowConfirm(true)}
-            title="Sign out"
+            title={!expanded ? "Sign out" : undefined}
             className={cn(
               "text-gray-400 hover:text-red-400 transition-colors",
-              collapsed
-                ? "p-2 rounded-lg hover:bg-gray-800"
-                : "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-800"
+              expanded
+                ? "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-800"
+                : "p-2 rounded-lg hover:bg-gray-800"
             )}
           >
             <LogOut size={15} />
-            {!collapsed && <span>Sign out</span>}
+            {expanded && <span>Sign out</span>}
           </button>
+        </div>
+
+        {/* Sidebar control — bottom toggle */}
+        <div className="relative border-t border-gray-700 px-2 py-2 shrink-0" ref={menuRef}>
+          <button
+            onClick={() => setShowModeMenu((v) => !v)}
+            title="Sidebar control"
+            className={cn(
+              "flex items-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors",
+              expanded ? "gap-2 px-3 py-2 w-full text-sm" : "justify-center p-3 w-full"
+            )}
+          >
+            {mode === "expanded"
+              ? <PanelLeftClose size={16} />
+              : <PanelLeftOpen size={16} />}
+            {expanded && <span>Sidebar control</span>}
+          </button>
+
+          {/* Mode popover */}
+          {showModeMenu && (
+            <div className="absolute bottom-full left-2 mb-1 w-48 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50">
+              {modeOptions.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setModeAndSave(key)}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-700 transition-colors"
+                >
+                  <span className={cn(
+                    "w-2 h-2 rounded-full border-2 shrink-0",
+                    mode === key ? "border-blue-400 bg-blue-400" : "border-gray-500"
+                  )} />
+                  <span className={mode === key ? "text-white font-medium" : "text-gray-400"}>{label}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </aside>
 
