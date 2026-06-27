@@ -154,7 +154,6 @@ export default function ConversationsPage() {
                     </div>
                     <div className="flex justify-between items-center mt-0.5">
                       <p className="text-xs text-[var(--text-muted)] truncate">{c.lastMessage}</p>
-                      {c.unread > 0 && <span className="ml-1 shrink-0 w-4 h-4 rounded-full bg-blue-600 text-[var(--text)] text-xs flex items-center justify-center">{c.unread}</span>}
                     </div>
                   </div>
                 </div>
