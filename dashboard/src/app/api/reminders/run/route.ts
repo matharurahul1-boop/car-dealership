@@ -81,21 +81,20 @@ export async function GET() {
     .select("*")
     .eq("status", "confirmed");
 
-  // Fetch already-sent reminders
+  // Fetch already-sent reminders (table may not exist yet — handle gracefully)
   const { data: sentLog } = await supabaseAdmin
     .from("reminders_log")
     .select("booking_id");
 
+  // sentIds = database log + in-memory set (prevents duplicates within same run even if DB insert fails)
   const sentIds = new Set((sentLog ?? []).map((r: { booking_id: string }) => r.booking_id));
 
-  // Exact time-based: reminder fires when (booking_time - hoursBefore) is within ±15 min of now
-  // Bookings are in IST (UTC+5:30), so we add 5.5h to convert booking local time → UTC
   const IST_MS = 5.5 * 60 * 60 * 1000;
   const now = new Date();
-  const WINDOW_MS = 15 * 60 * 1000; // ±15 minutes
   const sent: string[] = [];
 
   for (const booking of bookings ?? []) {
+    // Skip if already sent (DB check + in-memory check for current run)
     if (sentIds.has(booking.id)) continue;
 
     const bookingDate = parseBookingDate(booking.date);
@@ -104,18 +103,17 @@ export async function GET() {
     const bookingTime = parseBookingTime(booking.time);
     if (!bookingTime) continue;
 
-    // Booking datetime in IST (treated as local), convert to UTC
+    // Convert booking IST datetime → UTC
     const bookingIST = new Date(
       bookingDate.getFullYear(), bookingDate.getMonth(), bookingDate.getDate(),
       bookingTime.hours, bookingTime.minutes
     );
     const bookingUTC = new Date(bookingIST.getTime() - IST_MS);
 
-    // When should the reminder fire? bookingUTC - hoursBefore
+    // Reminder fire time = booking time - X hours
     const reminderFireAt = new Date(bookingUTC.getTime() - hoursBefore * 3600000);
 
-    // Send if reminder fire time has passed within the last 30 minutes
-    // (covers bookings created after the previous cron run)
+    // Fire if reminder time has passed within the last 30 min (matches cron interval)
     const pastWindow = new Date(now.getTime() - 30 * 60 * 1000);
     if (reminderFireAt <= now && reminderFireAt >= pastWindow) {
       const message = messageTemplate
@@ -126,9 +124,13 @@ export async function GET() {
 
       await sendWhatsApp(booking.phone, message);
 
+      // Mark as sent immediately in memory so this booking is skipped if endpoint is called again
+      sentIds.add(booking.id);
+
+      // Persist to DB — UNIQUE constraint on booking_id prevents any future duplicates
       await supabaseAdmin
         .from("reminders_log")
-        .insert({ booking_id: booking.id, phone: booking.phone });
+        .upsert({ booking_id: booking.id, phone: booking.phone }, { onConflict: "booking_id", ignoreDuplicates: true });
 
       sent.push(booking.phone);
     }
