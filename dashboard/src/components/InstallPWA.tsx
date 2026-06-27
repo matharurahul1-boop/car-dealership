@@ -44,7 +44,6 @@ export function InstallPWA() {
   }, []);
 
   if (isStandalone) return null;
-  if (!isIOS && !installPrompt) return null;
 
   const handleInstall = async () => {
     if (installPrompt) {
