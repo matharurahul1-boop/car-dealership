@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="100" fill="#1e40af"/>
+  <!-- Car body -->
+  <rect x="80" y="260" width="352" height="110" rx="18" fill="white"/>
+  <!-- Car roof -->
+  <path d="M160 260 L190 180 L320 180 L355 260 Z" fill="white"/>
+  <!-- Windshield -->
+  <path d="M200 255 L220 198 L295 198 L318 255 Z" fill="#bfdbfe"/>
+  <!-- Wheels -->
+  <circle cx="160" cy="375" r="45" fill="#1e3a8a"/>
+  <circle cx="160" cy="375" r="22" fill="#93c5fd"/>
+  <circle cx="350" cy="375" r="45" fill="#1e3a8a"/>
+  <circle cx="350" cy="375" r="22" fill="#93c5fd"/>
+  <!-- Headlights -->
+  <rect x="82" y="285" width="40" height="20" rx="5" fill="#fbbf24"/>
+  <rect x="390" y="285" width="40" height="20" rx="5" fill="#fbbf24"/>
+  <!-- Door line -->
+  <line x1="255" y1="265" x2="255" y2="365" stroke="#e2e8f0" stroke-width="4"/>
+</svg>
