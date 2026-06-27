@@ -88,7 +88,7 @@ export function Sidebar() {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className={cn(
-          "hidden min-[900px]:flex flex-col shrink-0 bg-gray-900 border-r border-gray-700 overflow-hidden",
+          "hidden min-[900px]:flex flex-col shrink-0 bg-gray-900 border-r border-gray-700 relative",
           "transition-[width] duration-200 ease-in-out",
           expanded ? "w-64" : "w-[60px]"
         )}

@@ -113,9 +113,9 @@ export async function GET() {
     // Reminder fire time = booking time - X hours
     const reminderFireAt = new Date(bookingUTC.getTime() - hoursBefore * 3600000);
 
-    // Fire if reminder time has passed within the last 30 min (matches cron interval)
-    const pastWindow = new Date(now.getTime() - 30 * 60 * 1000);
-    if (reminderFireAt <= now && reminderFireAt >= pastWindow) {
+    // Fire if reminder time has already passed (daily cron — no lower bound).
+    // reminders_log unique constraint prevents double-sending.
+    if (reminderFireAt <= now) {
       // Claim the slot FIRST — insert fails if already sent (race condition safe)
       const { error: claimError } = await supabaseAdmin
         .from("reminders_log")
