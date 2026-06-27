@@ -35,6 +35,18 @@ export default function ConversationsPage() {
 
   useEffect(() => { fetchConversations(); }, [fetchConversations]);
 
+  // Poll every 8 seconds as a reliable fallback (Supabase realtime needs table replication enabled)
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const res = await fetch("/api/conversations");
+      const data = await res.json();
+      const convs: Conversation[] = data.conversations || [];
+      setConversations(convs);
+      setSelected((prev) => prev ? convs.find((c) => c.phone === prev.phone) ?? prev : prev);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Real-time new messages via Supabase
   useEffect(() => {
     const channel = supabase
