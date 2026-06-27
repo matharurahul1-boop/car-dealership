@@ -106,21 +106,22 @@ export default function BookingsPage() {
         subtitle={`${bookings.length} total test drives`}
         onRefresh={fetchBookings}
         refreshing={loading}
-        actions={
-          <div className="flex gap-1.5">
-            <Button variant="secondary" size="sm" onClick={exportCSV} className="px-2 sm:px-3" title="Export CSV"><Download size={14} /><span className="hidden sm:inline"> Export</span></Button>
-            <Button size="sm" onClick={() => setShowModal(true)} className="px-2 sm:px-3" title="New Booking"><Plus size={14} /><span className="hidden sm:inline"> New Booking</span></Button>
-          </div>
-        }
       />
 
       <div className="flex-1 overflow-y-auto">
-        <div className="px-3 sm:px-6 pt-4 flex gap-2 flex-wrap">
-          {(["all", "confirmed", "completed", "cancelled"] as const).map((s) => (
-            <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-white" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-[var(--bg-hover)]"}`}>
-              {s} ({counts[s]})
-            </button>
-          ))}
+        {/* Filter bar + action buttons */}
+        <div className="px-3 sm:px-6 pt-4 flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap">
+            {(["all", "confirmed", "completed", "cancelled"] as const).map((s) => (
+              <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-white" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-[var(--bg-hover)]"}`}>
+                {s} ({counts[s]})
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <Button variant="secondary" size="sm" onClick={exportCSV} title="Export CSV"><Download size={14} /> Export</Button>
+            <Button size="sm" onClick={() => setShowModal(true)} title="New Booking"><Plus size={14} /> New Booking</Button>
+          </div>
         </div>
 
         <div className="px-3 sm:px-6 pt-3 pb-3">

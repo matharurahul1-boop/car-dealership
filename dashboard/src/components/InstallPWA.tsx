@@ -77,10 +77,12 @@ export function InstallPWA() {
   if (isStandalone) return null;
 
   const handleYes = async () => {
+    // Use state first, then fall back to globally captured prompt
+    const prompt = installPrompt ?? window.__installPrompt ?? null;
     setShowConfirm(false);
-    if (installPrompt) {
-      await installPrompt.prompt();
-      const { outcome } = await installPrompt.userChoice;
+    if (prompt) {
+      await prompt.prompt();
+      const { outcome } = await prompt.userChoice;
       if (outcome === "accepted") {
         setIsInstalled(true);
         localStorage.setItem(INSTALLED_KEY, "true");
@@ -88,7 +90,7 @@ export function InstallPWA() {
         window.__installPrompt = undefined;
       }
     }
-    // iOS: no programmatic prompt — browser handles it via its own UI
+    // iOS: the dialog above already shows Share → Add to Home Screen steps
   };
 
   if (isInstalled) {
