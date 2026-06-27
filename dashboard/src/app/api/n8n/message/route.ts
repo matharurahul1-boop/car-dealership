@@ -18,13 +18,15 @@ export async function POST(req: NextRequest) {
 
   const inserts = [];
 
-  const now = new Date().toISOString();
+  const now = new Date();
   if (inbound_text) {
-    inserts.push({ phone, name: name || phone, text: inbound_text, direction: "inbound", created_at: now });
+    inserts.push({ phone, name: name || phone, text: inbound_text, direction: "inbound", created_at: now.toISOString() });
   }
 
   if (outbound_text) {
-    inserts.push({ phone, name: name || phone, text: outbound_text, direction: "outbound", created_at: now });
+    // 1 second after inbound so outbound always sorts last (bot reply after customer message)
+    const outboundTime = new Date(now.getTime() + 1000).toISOString();
+    inserts.push({ phone, name: name || phone, text: outbound_text, direction: "outbound", created_at: outboundTime });
   }
 
   if (inserts.length > 0) {
