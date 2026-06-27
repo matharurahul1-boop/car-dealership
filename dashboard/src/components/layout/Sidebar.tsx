@@ -54,7 +54,7 @@ export function Sidebar() {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-700">
+      <div className="flex items-center gap-3 px-5 h-[70px] border-b border-gray-700">
         <div className="bg-blue-600 rounded-lg p-2">
           <Car size={18} className="text-white" />
         </div>

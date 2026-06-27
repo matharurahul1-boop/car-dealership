@@ -194,8 +194,8 @@ export function InstallPWA() {
                     Got it
                   </button>
                 </>
-              ) : (
-                /* Android / Desktop Chrome — native prompt */
+              ) : installPrompt ? (
+                /* Native prompt available — direct install */
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowModal(false)}
@@ -205,12 +205,26 @@ export function InstallPWA() {
                   </button>
                   <button
                     onClick={handleInstall}
-                    disabled={!installPrompt}
-                    className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                   >
                     <Download size={15} /> Install
                   </button>
                 </div>
+              ) : (
+                /* Prompt not fired yet — guide to browser install button */
+                <>
+                  <div className="flex items-start gap-3 bg-[#1e293b] rounded-xl p-4 mb-4">
+                    <div className="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <Download size={14} className="text-blue-400" />
+                    </div>
+                    <p className="text-gray-300 text-sm leading-relaxed">
+                      Click the <strong className="text-white">install icon <Download size={12} className="inline" /></strong> in your browser&apos;s address bar to install the app.
+                    </p>
+                  </div>
+                  <button onClick={() => setShowModal(false)} className="w-full py-3 rounded-xl bg-gray-700 text-white text-sm font-semibold hover:bg-gray-600 transition-colors">
+                    Got it
+                  </button>
+                </>
               )}
             </div>
           </div>
