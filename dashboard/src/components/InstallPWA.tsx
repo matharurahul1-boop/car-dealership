@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Download, X, Share, Car, Wifi, Bell, BarChart2 } from "lucide-react";
+import { Download, X, Share, Car, Wifi, Bell, BarChart2, ExternalLink } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -13,34 +13,57 @@ declare global {
   }
 }
 
+const INSTALLED_KEY = "pwa-installed";
+
 export function InstallPWA() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    // Already running inside the installed app — hide everything
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setIsStandalone(true);
       return;
     }
 
-    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    setIsIOS(ios);
+    setIsIOS(/iphone|ipad|ipod/i.test(navigator.userAgent));
 
+    // Check if previously installed (persisted flag)
+    if (localStorage.getItem(INSTALLED_KEY) === "true") {
+      setIsInstalled(true);
+    }
+
+    // Pick up prompt captured by early inline script
     if (window.__installPrompt) {
       setInstallPrompt(window.__installPrompt);
     }
 
-    const handler = (e: Event) => {
+    const onPrompt = (e: Event) => {
       e.preventDefault();
       window.__installPrompt = e as BeforeInstallPromptEvent;
       setInstallPrompt(e as BeforeInstallPromptEvent);
+      // If prompt fires again, app was uninstalled — clear flag
+      setIsInstalled(false);
+      localStorage.removeItem(INSTALLED_KEY);
     };
-    window.addEventListener("beforeinstallprompt", handler);
-    window.addEventListener("appinstalled", () => setIsStandalone(true));
 
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    const onInstalled = () => {
+      setIsInstalled(true);
+      setIsStandalone(false); // still in browser, but now installed
+      localStorage.setItem(INSTALLED_KEY, "true");
+      setInstallPrompt(null);
+      window.__installPrompt = undefined;
+    };
+
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
   }, []);
 
   if (isStandalone) return null;
@@ -50,28 +73,48 @@ export function InstallPWA() {
       setShowModal(false);
       await installPrompt.prompt();
       const { outcome } = await installPrompt.userChoice;
-      if (outcome === "accepted") setIsStandalone(true);
-      setInstallPrompt(null);
-      window.__installPrompt = undefined;
+      if (outcome === "accepted") {
+        setIsInstalled(true);
+        localStorage.setItem(INSTALLED_KEY, "true");
+        setInstallPrompt(null);
+        window.__installPrompt = undefined;
+      }
     }
   };
 
+  const handleOpenApp = () => {
+    // Opening the PWA start URL in a new tab lets Chrome/Android redirect into the installed app
+    window.open(window.location.origin + "/dashboard", "_blank", "noopener");
+    setShowModal(false);
+  };
+
   const features = [
-    { icon: Wifi, text: "Works offline — no internet needed" },
-    { icon: Bell, text: "Fast access from your home screen" },
+    { icon: Wifi,      text: "Works offline — no internet needed" },
+    { icon: Bell,      text: "Fast access from your home screen" },
     { icon: BarChart2, text: "Full dashboard experience as an app" },
-    { icon: Car, text: "Manage leads, bookings & chats" },
+    { icon: Car,       text: "Manage leads, bookings & chats" },
   ];
 
   return (
     <>
-      <button
-        onClick={() => setShowModal(true)}
-        className="p-2 rounded-lg transition-colors bg-blue-600 hover:bg-blue-700 text-white"
-        title="Install App"
-      >
-        <Download size={17} />
-      </button>
+      {isInstalled ? (
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white"
+          title="Open installed app"
+        >
+          <ExternalLink size={15} />
+          <span className="hidden sm:inline">Open App</span>
+        </button>
+      ) : (
+        <button
+          onClick={() => setShowModal(true)}
+          className="p-2 rounded-lg transition-colors bg-blue-600 hover:bg-blue-700 text-white"
+          title="Install App"
+        >
+          <Download size={17} />
+        </button>
+      )}
 
       {showModal && (
         <div
@@ -82,7 +125,7 @@ export function InstallPWA() {
             className="bg-[#0f172a] border border-gray-700 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
+            {/* Banner */}
             <div className="bg-blue-600 px-5 pt-6 pb-8 text-center relative">
               <button
                 onClick={() => setShowModal(false)}
@@ -95,6 +138,11 @@ export function InstallPWA() {
               </div>
               <h2 className="text-white font-bold text-lg leading-tight">Handysolver</h2>
               <p className="text-blue-200 text-sm mt-0.5">Car Dealership Dashboard</p>
+              {isInstalled && (
+                <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-0.5 rounded-full bg-green-500/20 text-green-300 text-xs font-medium">
+                  ✓ Installed
+                </span>
+              )}
             </div>
 
             {/* Body */}
@@ -110,7 +158,24 @@ export function InstallPWA() {
                 ))}
               </div>
 
-              {isIOS ? (
+              {isInstalled ? (
+                /* Already installed — offer to open the app */
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="flex-1 py-3 rounded-xl bg-gray-700 text-gray-300 text-sm font-semibold hover:bg-gray-600 transition-colors"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={handleOpenApp}
+                    className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <ExternalLink size={15} /> Open App
+                  </button>
+                </div>
+              ) : isIOS ? (
+                /* iOS — show manual steps */
                 <>
                   <p className="text-gray-400 text-xs mb-3 text-center">Install via Safari:</p>
                   <div className="space-y-2 mb-5">
@@ -130,6 +195,7 @@ export function InstallPWA() {
                   </button>
                 </>
               ) : (
+                /* Android / Desktop Chrome — native prompt */
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowModal(false)}
@@ -139,7 +205,8 @@ export function InstallPWA() {
                   </button>
                   <button
                     onClick={handleInstall}
-                    className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                    disabled={!installPrompt}
+                    className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
                   >
                     <Download size={15} /> Install
                   </button>
