@@ -116,6 +116,17 @@ export async function GET() {
     // Fire if reminder time has passed within the last 30 min (matches cron interval)
     const pastWindow = new Date(now.getTime() - 30 * 60 * 1000);
     if (reminderFireAt <= now && reminderFireAt >= pastWindow) {
+      // Claim the slot FIRST — insert fails if already sent (race condition safe)
+      const { error: claimError } = await supabaseAdmin
+        .from("reminders_log")
+        .insert({ booking_id: booking.id, phone: booking.phone });
+
+      if (claimError) {
+        // Unique constraint violation = already sent by a concurrent run, skip
+        sentIds.add(booking.id);
+        continue;
+      }
+
       const message = messageTemplate
         .replace("{name}", booking.name || booking.phone)
         .replace("{car}", booking.car || "your chosen car")
@@ -123,15 +134,7 @@ export async function GET() {
         .replace("{time}", booking.time);
 
       await sendWhatsApp(booking.phone, message);
-
-      // Mark as sent immediately in memory so this booking is skipped if endpoint is called again
       sentIds.add(booking.id);
-
-      // Persist to DB — UNIQUE constraint on booking_id prevents any future duplicates
-      await supabaseAdmin
-        .from("reminders_log")
-        .upsert({ booking_id: booking.id, phone: booking.phone }, { onConflict: "booking_id", ignoreDuplicates: true });
-
       sent.push(booking.phone);
     }
   }
