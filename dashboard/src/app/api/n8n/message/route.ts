@@ -42,20 +42,41 @@ export async function POST(req: NextRequest) {
 
   // Save booking if AI collected one
   if (booking?.car && booking?.date && booking?.time) {
-    await supabaseAdmin.from("bookings").insert({
-      phone,
-      name: name || phone,
-      car: booking.car,
-      date: booking.date,
-      time: booking.time,
-      status: "confirmed",
-    });
+    const carName = String(booking.car).trim();
 
-    // Update lead status to booked
-    await supabaseAdmin
-      .from("leads")
-      .update({ status: "booked" })
-      .eq("phone", phone);
+    // Reject multi-car bookings (AI bundling two cars into one field)
+    const isMultiCar = carName.includes(",") || carName.includes(" and ") || carName.includes(" & ");
+    if (!isMultiCar) {
+      // Check if booking already exists for this phone + car (reschedule = UPDATE, new = INSERT)
+      const { data: existing } = await supabaseAdmin
+        .from("bookings")
+        .select("id")
+        .eq("phone", phone)
+        .ilike("car", carName)
+        .eq("status", "confirmed")
+        .maybeSingle();
+
+      if (existing) {
+        // Reschedule: update existing booking
+        await supabaseAdmin
+          .from("bookings")
+          .update({ date: booking.date, time: booking.time, name: name || phone })
+          .eq("id", existing.id);
+      } else {
+        // New booking: insert
+        await supabaseAdmin.from("bookings").insert({
+          phone,
+          name: name || phone,
+          car: carName,
+          date: booking.date,
+          time: booking.time,
+          status: "confirmed",
+        });
+      }
+
+      // Update lead status to booked
+      await supabaseAdmin.from("leads").update({ status: "booked" }).eq("phone", phone);
+    }
   }
 
   return NextResponse.json({ success: true });
