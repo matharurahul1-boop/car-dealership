@@ -18,6 +18,7 @@ export default function ConversationsPage() {
   const [sending, setSending] = useState(false);
   const [search, setSearch] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const fetchConversations = useCallback(async () => {
     setLoading(true);
@@ -62,8 +63,14 @@ export default function ConversationsPage() {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [selected?.messages?.length]);
-  useEffect(() => { if (selected) setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "auto" }), 50); }, [selected?.phone]);
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      const el = messagesEndRef.current;
+      el.scrollTop = el.scrollHeight;
+    }
+  };
+  useEffect(() => { scrollToBottom(); }, [selected?.messages?.length]);
+  useEffect(() => { if (selected) setTimeout(() => scrollToBottom(), 80); }, [selected?.phone]);
 
   const sendMessage = async () => {
     if (!selected || !message.trim()) return;
@@ -88,7 +95,7 @@ export default function ConversationsPage() {
     if (!ts) return "";
     const d = new Date(ts);
     if (isNaN(d.getTime())) return "";
-    return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+    return d.toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: true });
   };
   const filtered = conversations.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search));
 
@@ -156,7 +163,7 @@ export default function ConversationsPage() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{ background: "var(--bg)" }}>
+            <div ref={messagesEndRef} className="flex-1 overflow-y-auto p-4 space-y-2" style={{ background: "var(--bg)" }}>
               {(!selected.messages || selected.messages.length === 0) && (
                 <p className="text-center text-[var(--text-muted)] text-sm py-8">No messages yet</p>
               )}

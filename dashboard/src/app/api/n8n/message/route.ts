@@ -18,12 +18,13 @@ export async function POST(req: NextRequest) {
 
   const inserts = [];
 
+  const now = new Date().toISOString();
   if (inbound_text) {
-    inserts.push({ phone, name: name || phone, text: inbound_text, direction: "inbound" });
+    inserts.push({ phone, name: name || phone, text: inbound_text, direction: "inbound", created_at: now });
   }
 
   if (outbound_text) {
-    inserts.push({ phone, name: name || phone, text: outbound_text, direction: "outbound" });
+    inserts.push({ phone, name: name || phone, text: outbound_text, direction: "outbound", created_at: now });
   }
 
   if (inserts.length > 0) {
@@ -32,21 +33,11 @@ export async function POST(req: NextRequest) {
 
   // Save booking if AI collected one
   if (booking?.car && booking?.date && booking?.time) {
-    // Cancel any existing confirmed bookings for this phone before inserting new one
-    await supabaseAdmin
-      .from("bookings")
-      .update({ status: "cancelled" })
-      .eq("phone", phone)
-      .eq("status", "confirmed");
-
-    await supabaseAdmin.from("bookings").insert({
-      phone,
-      name: name || phone,
-      car: booking.car,
-      date: booking.date,
-      time: booking.time,
-      status: "confirmed",
-    });
+    // Upsert: one active booking per phone number (unique constraint on phone)
+    await supabaseAdmin.from("bookings").upsert(
+      { phone, name: name || phone, car: booking.car, date: booking.date, time: booking.time, status: "confirmed" },
+      { onConflict: "phone" }
+    );
 
     // Update lead status to booked
     await supabaseAdmin

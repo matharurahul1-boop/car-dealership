@@ -32,7 +32,7 @@ export async function GET() {
       });
     }
     const conv = convMap.get(msg.phone)!;
-    conv.messages.push(msg);
+    conv.messages.push({ ...msg, timestamp: msg.created_at });
     conv.lastMessage = msg.text;
     conv.lastMessageTime = msg.created_at;
     if (msg.direction === "inbound") conv.unread++;
