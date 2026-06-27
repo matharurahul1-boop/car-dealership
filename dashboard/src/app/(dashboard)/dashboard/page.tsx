@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
       <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {loading ? (
             Array.from({ length: 6 }).map((_, i) => <StatsCardSkeleton key={i} />)
           ) : (
