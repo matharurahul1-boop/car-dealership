@@ -9,7 +9,7 @@ import { Input, Select } from "@/components/ui/input";
 import { TableRowSkeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/toast";
 import { formatPhone } from "@/lib/utils";
-import { Plus, Search, UserPlus, Download, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { Plus, Search, UserPlus, Download, ChevronLeft, ChevronRight, Trash2, AlertTriangle } from "lucide-react";
 import type { Lead } from "@/lib/types";
 
 type LeadStatus = Lead["status"];
@@ -28,6 +28,7 @@ export default function LeadsPage() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", interest: "", source: "WhatsApp" });
   const [selected, setSelected] = useState<Lead | null>(null);
@@ -73,11 +74,14 @@ export default function LeadsPage() {
     toast("Notes saved", "success");
   };
 
-  const deleteLead = async (id: string) => {
-    if (!confirm("Delete this lead? This cannot be undone.")) return;
-    await fetch(`/api/leads/${id}`, { method: "DELETE" });
-    setLeads((prev) => prev.filter((l) => l.id !== id));
-    setSelected(null);
+  const deleteLead = (id: string) => setConfirmDeleteId(id);
+
+  const confirmDelete = async () => {
+    if (!confirmDeleteId) return;
+    await fetch(`/api/leads/${confirmDeleteId}`, { method: "DELETE" });
+    setLeads((prev) => prev.filter((l) => l.id !== confirmDeleteId));
+    if (selected?.id === confirmDeleteId) setSelected(null);
+    setConfirmDeleteId(null);
     toast("Lead deleted", "info");
   };
 
@@ -279,6 +283,44 @@ export default function LeadsPage() {
           </div>
         )}
       </Drawer>
+
+      {/* Delete confirmation dialog */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
+          <div className="rounded-2xl border border-[var(--border)] w-full max-w-sm shadow-2xl overflow-hidden" style={{ background: "var(--bg-card)" }}>
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                  <AlertTriangle size={22} className="text-red-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[var(--text)]">Delete Lead?</h3>
+                  <p className="text-sm text-[var(--text-muted)] mt-0.5">
+                    {leads.find((l) => l.id === confirmDeleteId)?.name && (
+                      <><strong className="text-[var(--text-sub)]">{leads.find((l) => l.id === confirmDeleteId)?.name}</strong> and all their data will be</>
+                    )} permanently removed. This cannot be undone.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setConfirmDeleteId(null)}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                  style={{ background: "var(--bg-muted)", color: "var(--text-sub)" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-500 hover:bg-red-600 text-white transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Lead Modal */}
       <Modal open={showModal} onClose={() => setShowModal(false)} title="Add New Lead">
