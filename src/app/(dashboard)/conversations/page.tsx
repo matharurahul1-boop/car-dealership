@@ -6,7 +6,7 @@ import { ChatSkeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/toast";
 import { supabase } from "@/lib/supabase";
 import { formatPhone } from "@/lib/utils";
-import { MessageCircle, Send, Search, ArrowLeft } from "lucide-react";
+import { MessageCircle, Send, Search } from "lucide-react";
 import type { Conversation } from "@/lib/types";
 
 export default function ConversationsPage() {
@@ -17,9 +17,7 @@ export default function ConversationsPage() {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [search, setSearch] = useState("");
-  const [showChat, setShowChat] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const fetchConversations = useCallback(async () => {
     setLoading(true);
@@ -36,17 +34,7 @@ export default function ConversationsPage() {
 
   useEffect(() => { fetchConversations(); }, [fetchConversations]);
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const res = await fetch("/api/conversations");
-      const data = await res.json();
-      const convs: Conversation[] = data.conversations || [];
-      setConversations(convs);
-      setSelected((prev) => prev ? convs.find((c) => c.phone === prev.phone) ?? prev : prev);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, []);
-
+  // Real-time new messages via Supabase
   useEffect(() => {
     const channel = supabase
       .channel("messages-realtime")
@@ -74,14 +62,7 @@ export default function ConversationsPage() {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      const el = messagesEndRef.current;
-      el.scrollTop = el.scrollHeight;
-    }
-  };
-  useEffect(() => { scrollToBottom(); }, [selected?.messages?.length]);
-  useEffect(() => { if (selected) setTimeout(() => scrollToBottom(), 80); }, [selected?.phone]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [selected?.messages?.length]);
 
   const sendMessage = async () => {
     if (!selected || !message.trim()) return;
@@ -102,31 +83,20 @@ export default function ConversationsPage() {
     }
   };
 
-  const formatTime = (ts: string) => {
-    if (!ts) return "";
-    const d = new Date(ts);
-    if (isNaN(d.getTime())) return "";
-    return d.toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: true });
-  };
+  const formatTime = (ts: string) => new Date(ts).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
   const filtered = conversations.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search));
-
-  const selectConversation = (c: Conversation) => {
-    setSelected(c);
-    setShowChat(true);
-    setConversations((prev) => prev.map((conv) => conv.phone === c.phone ? { ...conv, unread: 0 } : conv));
-  };
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="Conversations" subtitle="WhatsApp customer chats" onRefresh={fetchConversations} refreshing={loading} />
+      <Header title="Conversations" subtitle="WhatsApp customer chats · Real-time" onRefresh={fetchConversations} refreshing={loading} />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Contact list — full-width on mobile, fixed 288px on desktop */}
-        <div className={`${showChat ? "hidden lg:flex" : "flex"} w-full lg:w-72 border-r border-[var(--border)] bg-[var(--bg-card)] flex-col shrink-0`}>
+        {/* Sidebar */}
+        <div className="w-72 border-r border-[var(--border)] bg-[var(--bg-card)] flex flex-col shrink-0">
           <div className="p-3 border-b border-[var(--border)]">
             <div className="relative">
               <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="w-full pl-8 pr-3 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[var(--bg-input)] text-[var(--text)] placeholder:text-[var(--text-muted)]" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="w-full pl-8 pr-3 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -140,11 +110,11 @@ export default function ConversationsPage() {
             ) : filtered.map((c) => (
               <button
                 key={c.phone}
-                onClick={() => selectConversation(c)}
-                className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--bg)] transition-colors ${selected?.phone === c.phone ? "bg-blue-600/10 border-l-2 border-l-blue-600" : ""}`}
+                onClick={() => setSelected(c)}
+                className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--bg)] transition-colors ${selected?.phone === c.phone ? "bg-blue-50 border-l-2 border-l-blue-600" : ""}`}
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-[var(--text)] text-sm font-bold shrink-0">
                     {c.name?.[0]?.toUpperCase() || "?"}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -154,11 +124,7 @@ export default function ConversationsPage() {
                     </div>
                     <div className="flex justify-between items-center mt-0.5">
                       <p className="text-xs text-[var(--text-muted)] truncate">{c.lastMessage}</p>
-                      {c.unread > 0 && (
-                        <span className="ml-2 shrink-0 w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">
-                          {c.unread}
-                        </span>
-                      )}
+                      {c.unread > 0 && <span className="ml-1 shrink-0 w-4 h-4 rounded-full bg-blue-600 text-[var(--text)] text-xs flex items-center justify-center">{c.unread}</span>}
                     </div>
                   </div>
                 </div>
@@ -167,60 +133,53 @@ export default function ConversationsPage() {
           </div>
         </div>
 
-        {/* Chat area — full-width on mobile (toggle), flex-1 on desktop */}
+        {/* Chat area */}
         {selected ? (
-          <div className={`${showChat ? "flex" : "hidden lg:flex"} flex-1 flex-col min-w-0`}>
-            <div className="px-3 sm:px-5 py-3 border-b border-[var(--border)] bg-[var(--bg-card)] flex items-center gap-2 sm:gap-3">
-              {/* Back button — mobile only */}
-              <button
-                className="lg:hidden p-1.5 -ml-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-muted)] transition-colors shrink-0"
-                onClick={() => setShowChat(false)}
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+          <div className="flex-1 flex flex-col min-w-0">
+            <div className="px-5 py-3 border-b border-[var(--border)] bg-[var(--bg-card)] flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-[var(--text)] text-sm font-bold shrink-0">
                 {selected.name?.[0]?.toUpperCase() || "?"}
               </div>
-              <div className="min-w-0">
-                <p className="font-semibold text-[var(--text)] text-sm truncate">{selected.name}</p>
+              <div>
+                <p className="font-semibold text-[var(--text)] text-sm">{selected.name}</p>
                 <p className="text-xs text-[var(--text-muted)]">{formatPhone(selected.phone)}</p>
               </div>
-              <div className="ml-auto flex items-center gap-1.5 shrink-0">
+              <div className="ml-auto flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                 <span className="text-xs text-[var(--text-muted)]">Live</span>
               </div>
             </div>
 
-            <div ref={messagesEndRef} className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2" style={{ background: "var(--bg)" }}>
+            <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[#e5ddd5]">
               {(!selected.messages || selected.messages.length === 0) && (
                 <p className="text-center text-[var(--text-muted)] text-sm py-8">No messages yet</p>
               )}
               {selected.messages?.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[85%] sm:max-w-[75%] rounded-xl px-3 sm:px-4 py-2.5 shadow-sm ${msg.direction === "outbound" ? "bg-blue-600 rounded-br-none" : "rounded-bl-none"}`} style={msg.direction === "outbound" ? {} : { background: "var(--bg-card)", border: "1px solid var(--border)" }}>
-                    <p className={`text-sm whitespace-pre-wrap ${msg.direction === "outbound" ? "text-white" : "text-[var(--text)]"}`}>{msg.text}</p>
-                    <p className={`text-xs mt-1 text-right ${msg.direction === "outbound" ? "text-blue-100" : "text-[var(--text-muted)]"}`}>{formatTime(msg.timestamp)}</p>
+                  <div className={`max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm ${msg.direction === "outbound" ? "bg-[#dcf8c6] text-[var(--text)] rounded-br-none" : "bg-[var(--bg-card)] text-[var(--text)] rounded-bl-none"}`}>
+                    <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-1 text-right">{formatTime(msg.timestamp)}</p>
                   </div>
                 </div>
               ))}
               <div ref={bottomRef} />
             </div>
 
-            <div className="px-3 sm:px-4 py-3 border-t border-[var(--border)] bg-[var(--bg-card)] flex items-center gap-2 sm:gap-3">
+            <div className="px-4 py-3 border-t border-[var(--border)] bg-[var(--bg-card)] flex items-center gap-3">
               <input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
                 placeholder="Type a message…"
-                className="flex-1 border border-[var(--border)] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[var(--bg-input)] text-[var(--text)] placeholder:text-[var(--text-muted)]"
+                className="flex-1 border border-[var(--border)] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
               />
-              <Button onClick={sendMessage} loading={sending} size="sm" className="rounded-full px-3 sm:px-4 shrink-0">
+              <Button onClick={sendMessage} loading={sending} size="sm" className="rounded-full px-4">
                 <Send size={15} />
               </Button>
             </div>
           </div>
         ) : (
-          <div className={`${showChat ? "flex" : "hidden lg:flex"} flex-1 items-center justify-center bg-[var(--bg)]`}>
+          <div className="flex-1 flex items-center justify-center bg-[var(--bg)]">
             <div className="text-center">
               <MessageCircle size={48} className="mx-auto text-[var(--text-sub)] mb-3" />
               <p className="text-[var(--text-muted)] text-sm">Select a conversation</p>

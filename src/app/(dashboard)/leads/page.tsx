@@ -120,21 +120,21 @@ export default function LeadsPage() {
         onRefresh={fetchLeads}
         refreshing={loading}
         actions={
-          <div className="flex gap-1.5">
-            <Button variant="secondary" size="sm" onClick={exportCSV} className="px-2 sm:px-3"><Download size={14} /><span className="hidden sm:inline"> Export</span></Button>
-            <Button size="sm" onClick={() => setShowModal(true)} className="px-2 sm:px-3"><Plus size={14} /><span className="hidden sm:inline"> Add Lead</span></Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={exportCSV}><Download size={14} /> Export</Button>
+            <Button size="sm" onClick={() => setShowModal(true)}><Plus size={14} /> Add Lead</Button>
           </div>
         }
       />
 
       <div className="flex-1 overflow-y-auto">
         {/* Status filter */}
-        <div className="px-3 sm:px-6 pt-4 flex gap-2 flex-wrap">
+        <div className="px-6 pt-4 flex gap-2 flex-wrap">
           {(["all", ...STATUS_OPTIONS] as const).map((s) => (
             <button
               key={s}
               onClick={() => { setFilterStatus(s); setPage(1); }}
-              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-white" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-[var(--bg-hover)]"}`}
+              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-[var(--text)]" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-[var(--bg-hover)]"}`}
             >
               {s} ({s === "all" ? leads.length : counts[s as LeadStatus] ?? 0})
             </button>
@@ -142,15 +142,15 @@ export default function LeadsPage() {
         </div>
 
         {/* Search */}
-        <div className="px-3 sm:px-6 pt-3 pb-3">
+        <div className="px-6 pt-3 pb-3">
           <div className="relative max-w-sm">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-            <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search name, phone, interest…" className="w-full pl-8 pr-4 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[var(--bg-input)] text-[var(--text)] placeholder:text-[var(--text-muted)]" />
+            <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search name, phone, interest…" className="w-full pl-8 pr-4 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
           </div>
         </div>
 
         {/* Table */}
-        <div className="px-3 sm:px-6 pb-6">
+        <div className="px-6 pb-6">
           <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border)] shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

@@ -1,7 +1,6 @@
 "use client";
 import { RefreshCw, Bell, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
-import { InstallPWA } from "@/components/InstallPWA";
 
 interface HeaderProps {
   title: string;
@@ -15,17 +14,14 @@ export function Header({ title, subtitle, onRefresh, refreshing, actions }: Head
   const { theme, toggle } = useTheme();
 
   return (
-    <div
-      className="flex items-center justify-between pl-14 lg:pl-6 pr-3 sm:pr-6 py-3 sm:py-4 border-b shrink-0 gap-2"
-      style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}
-    >
-      <div className="min-w-0">
-        <h1 className="text-base sm:text-xl font-bold truncate" style={{ color: "var(--text)" }}>{title}</h1>
-        {subtitle && <p className="text-xs sm:text-sm mt-0.5 hidden sm:block truncate" style={{ color: "var(--text-muted)" }}>{subtitle}</p>}
+    <div className="flex items-center justify-between pl-14 lg:pl-6 pr-6 py-4 border-b"
+      style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+      <div>
+        <h1 className="text-xl font-bold" style={{ color: "var(--text)" }}>{title}</h1>
+        {subtitle && <p className="text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>{subtitle}</p>}
       </div>
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <div className="flex items-center gap-2">
         {actions}
-        <InstallPWA />
         {onRefresh && (
           <button
             onClick={onRefresh}
