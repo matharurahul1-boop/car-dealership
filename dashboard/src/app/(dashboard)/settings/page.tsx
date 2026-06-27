@@ -222,7 +222,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <CopyRow label="Provider" value="Groq" />
-            <CopyRow label="Model" value="llama-3.1-8b-instant" />
+            <CopyRow label="Model" value="llama-3.3-70b-versatile" />
             <CopyRow label="API Key" value="Stored securely in environment variables" />
           </CardContent>
         </Card>
