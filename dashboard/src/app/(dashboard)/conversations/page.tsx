@@ -63,6 +63,7 @@ export default function ConversationsPage() {
   }, []);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [selected?.messages?.length]);
+  useEffect(() => { if (selected) setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "auto" }), 50); }, [selected?.phone]);
 
   const sendMessage = async () => {
     if (!selected || !message.trim()) return;
@@ -83,7 +84,12 @@ export default function ConversationsPage() {
     }
   };
 
-  const formatTime = (ts: string) => new Date(ts).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+  const formatTime = (ts: string) => {
+    if (!ts) return "";
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+  };
   const filtered = conversations.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search));
 
   return (
@@ -111,7 +117,7 @@ export default function ConversationsPage() {
               <button
                 key={c.phone}
                 onClick={() => setSelected(c)}
-                className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--bg)] transition-colors ${selected?.phone === c.phone ? "bg-blue-50 border-l-2 border-l-blue-600" : ""}`}
+                className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--bg)] transition-colors ${selected?.phone === c.phone ? "bg-blue-600/10 border-l-2 border-l-blue-600" : ""}`}
               >
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-[var(--text)] text-sm font-bold shrink-0">
@@ -150,15 +156,15 @@ export default function ConversationsPage() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[#e5ddd5]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{ background: "var(--bg)" }}>
               {(!selected.messages || selected.messages.length === 0) && (
                 <p className="text-center text-[var(--text-muted)] text-sm py-8">No messages yet</p>
               )}
               {selected.messages?.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm ${msg.direction === "outbound" ? "bg-[#dcf8c6] text-[var(--text)] rounded-br-none" : "bg-[var(--bg-card)] text-[var(--text)] rounded-bl-none"}`}>
-                    <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-                    <p className="text-xs text-[var(--text-muted)] mt-1 text-right">{formatTime(msg.timestamp)}</p>
+                  <div className={`max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm ${msg.direction === "outbound" ? "bg-blue-600 rounded-br-none" : "rounded-bl-none"}`} style={msg.direction === "outbound" ? {} : { background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                    <p className={`text-sm whitespace-pre-wrap ${msg.direction === "outbound" ? "text-white" : "text-[var(--text)]"}`}>{msg.text}</p>
+                    <p className={`text-xs mt-1 text-right ${msg.direction === "outbound" ? "text-blue-100" : "text-[var(--text-muted)]"}`}>{formatTime(msg.timestamp)}</p>
                   </div>
                 </div>
               ))}
