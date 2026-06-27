@@ -35,11 +35,14 @@ export async function POST(req: NextRequest) {
 
   // Save booking if AI collected one
   if (booking?.car && booking?.date && booking?.time) {
-    // Upsert: one active booking per phone number (unique constraint on phone)
-    await supabaseAdmin.from("bookings").upsert(
-      { phone, name: name || phone, car: booking.car, date: booking.date, time: booking.time, status: "confirmed" },
-      { onConflict: "phone" }
-    );
+    await supabaseAdmin.from("bookings").insert({
+      phone,
+      name: name || phone,
+      car: booking.car,
+      date: booking.date,
+      time: booking.time,
+      status: "confirmed",
+    });
 
     // Update lead status to booked
     await supabaseAdmin
