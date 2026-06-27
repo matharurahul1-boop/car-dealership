@@ -1,6 +1,7 @@
 "use client";
 import { RefreshCw, Bell, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
+import { InstallPWA } from "@/components/InstallPWA";
 
 interface HeaderProps {
   title: string;
@@ -24,6 +25,7 @@ export function Header({ title, subtitle, onRefresh, refreshing, actions }: Head
       </div>
       <div className="flex items-center gap-2">
         {actions}
+        <InstallPWA />
         {onRefresh && (
           <button
             onClick={onRefresh}
