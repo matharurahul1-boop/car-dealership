@@ -108,8 +108,8 @@ export default function BookingsPage() {
         refreshing={loading}
         actions={
           <div className="flex gap-1.5">
-            <Button variant="secondary" size="sm" onClick={exportCSV} className="px-2 sm:px-3"><Download size={14} /><span className="hidden sm:inline"> Export</span></Button>
-            <Button size="sm" onClick={() => setShowModal(true)} className="px-2 sm:px-3"><Plus size={14} /><span className="hidden sm:inline"> New Booking</span></Button>
+            <Button variant="secondary" size="sm" onClick={exportCSV} className="px-2 sm:px-3" title="Export CSV"><Download size={14} /><span className="hidden sm:inline"> Export</span></Button>
+            <Button size="sm" onClick={() => setShowModal(true)} className="px-2 sm:px-3" title="New Booking"><Plus size={14} /><span className="hidden sm:inline"> New Booking</span></Button>
           </div>
         }
       />

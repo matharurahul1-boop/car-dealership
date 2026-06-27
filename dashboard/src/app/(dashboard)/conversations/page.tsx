@@ -122,7 +122,7 @@ export default function ConversationsPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Contact list — full-width on mobile, fixed 288px on desktop */}
-        <div className={`${showChat ? "hidden lg:flex" : "flex"} w-full lg:w-72 border-r border-[var(--border)] bg-[var(--bg-card)] flex-col shrink-0`}>
+        <div className={`${showChat ? "hidden min-[900px]:flex" : "flex"} w-full lg:w-72 border-r border-[var(--border)] bg-[var(--bg-card)] flex-col shrink-0`}>
           <div className="p-3 border-b border-[var(--border)]">
             <div className="relative">
               <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
@@ -169,11 +169,11 @@ export default function ConversationsPage() {
 
         {/* Chat area — full-width on mobile (toggle), flex-1 on desktop */}
         {selected ? (
-          <div className={`${showChat ? "flex" : "hidden lg:flex"} flex-1 flex-col min-w-0`}>
+          <div className={`${showChat ? "flex" : "hidden min-[900px]:flex"} flex-1 flex-col min-w-0`}>
             <div className="px-3 sm:px-5 py-3 border-b border-[var(--border)] bg-[var(--bg-card)] flex items-center gap-2 sm:gap-3">
               {/* Back button — mobile only */}
               <button
-                className="lg:hidden p-1.5 -ml-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-muted)] transition-colors shrink-0"
+                className="min-[900px]:hidden p-1.5 -ml-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-muted)] transition-colors shrink-0"
                 onClick={() => setShowChat(false)}
               >
                 <ArrowLeft size={18} />
@@ -220,7 +220,7 @@ export default function ConversationsPage() {
             </div>
           </div>
         ) : (
-          <div className={`${showChat ? "flex" : "hidden lg:flex"} flex-1 items-center justify-center bg-[var(--bg)]`}>
+          <div className={`${showChat ? "flex" : "hidden min-[900px]:flex"} flex-1 items-center justify-center bg-[var(--bg)]`}>
             <div className="text-center">
               <MessageCircle size={48} className="mx-auto text-[var(--text-sub)] mb-3" />
               <p className="text-[var(--text-muted)] text-sm">Select a conversation</p>

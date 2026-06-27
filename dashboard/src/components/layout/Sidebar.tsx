@@ -108,14 +108,14 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar — hidden on mobile */}
-      <aside className="hidden lg:flex w-64 min-h-screen bg-gray-900 flex-col shrink-0 border-r border-gray-700">
+      {/* Desktop sidebar — hidden at ≤900px */}
+      <aside className="hidden min-[900px]:flex w-64 min-h-screen bg-gray-900 flex-col shrink-0 border-r border-gray-700">
         {sidebarContent}
       </aside>
 
-      {/* Mobile bottom tab bar */}
+      {/* Bottom tab bar — visible at ≤900px */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-gray-700 bg-gray-900 flex items-stretch"
+        className="min-[900px]:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-gray-700 bg-gray-900 flex items-stretch"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {navItems.map(({ href, label, icon: Icon }) => {

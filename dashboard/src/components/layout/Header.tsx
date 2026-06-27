@@ -48,6 +48,7 @@ export function Header({ title, subtitle, onRefresh, refreshing, actions }: Head
         <button
           className="p-2 rounded-lg transition-colors relative"
           style={{ color: "var(--text-muted)" }}
+          title="Notifications"
         >
           <Bell size={18} />
         </button>

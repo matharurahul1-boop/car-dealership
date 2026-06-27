@@ -50,8 +50,7 @@ export function InstallPWA() {
     <>
       <button
         onClick={handleClick}
-        className="p-2 rounded-lg transition-colors"
-        style={{ color: "var(--text-muted)", background: "var(--bg-muted)" }}
+        className="p-2 rounded-lg transition-colors bg-blue-600 hover:bg-blue-700 text-white"
         title="Install App"
       >
         <Download size={17} />
