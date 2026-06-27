@@ -44,6 +44,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
+        {/* Capture beforeinstallprompt before React hydrates so it's never missed */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            window.__installPrompt = e;
+          });
+        `}} />
         <ThemeProvider>{children}</ThemeProvider>
         <PWARegister />
       </body>

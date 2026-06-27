@@ -7,14 +7,19 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+declare global {
+  interface Window {
+    __installPrompt?: BeforeInstallPromptEvent;
+  }
+}
+
 export function InstallPWA() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showIOSModal, setShowIOSModal] = useState(false);
 
   useEffect(() => {
-    // Already running as standalone PWA — hide button
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setIsStandalone(true);
       return;
@@ -23,8 +28,15 @@ export function InstallPWA() {
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
     setIsIOS(ios);
 
+    // Pick up event captured by the early inline script
+    if (window.__installPrompt) {
+      setInstallPrompt(window.__installPrompt);
+    }
+
+    // Also listen for it firing after mount
     const handler = (e: Event) => {
       e.preventDefault();
+      window.__installPrompt = e as BeforeInstallPromptEvent;
       setInstallPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", handler);
@@ -35,14 +47,18 @@ export function InstallPWA() {
 
   if (isStandalone) return null;
 
+  // On non-iOS without a prompt available, hide the button entirely
+  if (!isIOS && !installPrompt) return null;
+
   const handleClick = async () => {
     if (installPrompt) {
       await installPrompt.prompt();
       const { outcome } = await installPrompt.userChoice;
       if (outcome === "accepted") setIsStandalone(true);
       setInstallPrompt(null);
-    } else {
-      setShowModal(true);
+      window.__installPrompt = undefined;
+    } else if (isIOS) {
+      setShowIOSModal(true);
     }
   };
 
@@ -56,10 +72,11 @@ export function InstallPWA() {
         <Download size={17} />
       </button>
 
-      {showModal && (
+      {/* iOS-only: can't trigger install programmatically, show steps */}
+      {showIOSModal && (
         <div
           className="fixed inset-0 bg-black/60 z-[200] flex items-end sm:items-center justify-center p-4"
-          onClick={() => setShowModal(false)}
+          onClick={() => setShowIOSModal(false)}
         >
           <div
             className="bg-[#1e293b] border border-gray-700 rounded-2xl p-5 w-full max-w-sm shadow-2xl"
@@ -75,48 +92,26 @@ export function InstallPWA() {
                   <p className="text-gray-400 text-xs">Car Dealership Dashboard</p>
                 </div>
               </div>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white ml-2">
+              <button onClick={() => setShowIOSModal(false)} className="text-gray-400 hover:text-white ml-2">
                 <X size={18} />
               </button>
             </div>
 
-            {isIOS ? (
-              <>
-                <p className="text-gray-400 text-xs mb-3">Follow these steps in Safari:</p>
-                <div className="space-y-3">
-                  {[
-                    { step: 1, text: <>Tap the <Share size={13} className="inline text-blue-400 mx-0.5" /> <strong className="text-white">Share</strong> button at the bottom</> },
-                    { step: 2, text: <><strong className="text-white">Scroll down</strong> and tap <strong className="text-white">"Add to Home Screen"</strong></> },
-                    { step: 3, text: <>Tap <strong className="text-white">"Add"</strong> in the top right corner</> },
-                  ].map(({ step, text }) => (
-                    <div key={step} className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-full bg-blue-600/20 flex items-center justify-center shrink-0">
-                        <span className="text-blue-400 text-xs font-bold">{step}</span>
-                      </div>
-                      <p className="text-gray-300 text-sm">{text}</p>
-                    </div>
-                  ))}
+            <p className="text-gray-400 text-xs mb-3">Follow these steps in Safari:</p>
+            <div className="space-y-3">
+              {[
+                { step: 1, text: <>Tap the <Share size={13} className="inline text-blue-400 mx-0.5" /> <strong className="text-white">Share</strong> button at the bottom</> },
+                { step: 2, text: <><strong className="text-white">Scroll down</strong> and tap <strong className="text-white">"Add to Home Screen"</strong></> },
+                { step: 3, text: <>Tap <strong className="text-white">"Add"</strong> in the top right corner</> },
+              ].map(({ step, text }) => (
+                <div key={step} className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-blue-600/20 flex items-center justify-center shrink-0">
+                    <span className="text-blue-400 text-xs font-bold">{step}</span>
+                  </div>
+                  <p className="text-gray-300 text-sm">{text}</p>
                 </div>
-              </>
-            ) : (
-              <>
-                <p className="text-gray-400 text-xs mb-3">To install on Android or Desktop Chrome:</p>
-                <div className="space-y-3">
-                  {[
-                    { step: 1, text: <><strong className="text-white">Open this site in Chrome</strong></> },
-                    { step: 2, text: <>Tap the <strong className="text-white">⋮ menu</strong> (top right)</> },
-                    { step: 3, text: <>Tap <strong className="text-white">"Add to Home screen"</strong> or <strong className="text-white">"Install app"</strong></> },
-                  ].map(({ step, text }) => (
-                    <div key={step} className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-full bg-blue-600/20 flex items-center justify-center shrink-0">
-                        <span className="text-blue-400 text-xs font-bold">{step}</span>
-                      </div>
-                      <p className="text-gray-300 text-sm">{text}</p>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+              ))}
+            </div>
           </div>
         </div>
       )}

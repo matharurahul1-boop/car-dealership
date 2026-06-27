@@ -103,7 +103,7 @@ export default function SettingsPage() {
     <div className="flex flex-col h-full">
       <Header title="Settings" subtitle="Integrations and configuration" />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-5 max-w-3xl">
+      <div className="flex-1 overflow-y-auto p-6 space-y-5">
 
         {/* Supabase */}
         <Card>
