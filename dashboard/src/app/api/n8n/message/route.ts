@@ -8,13 +8,20 @@ export async function POST(req: NextRequest) {
 
   if (!phone) return NextResponse.json({ error: "phone required" }, { status: 400 });
 
-  // Upsert lead (create if not exists, don't overwrite status)
+  const isRealName = name && !name.startsWith("WA-");
+
+  // Insert lead if first time (ignoreDuplicates: true so we never overwrite with WA- fallback)
   await supabaseAdmin
     .from("leads")
     .upsert(
-      { phone, name: name || phone, status: "contacted", source: "WhatsApp" },
-      { onConflict: "phone", ignoreDuplicates: false }
+      { phone, name: isRealName ? name : phone, status: "contacted", source: "WhatsApp" },
+      { onConflict: "phone", ignoreDuplicates: true }
     );
+
+  // If we now have a real name, update it (separate update so WA- never overwrites a real name)
+  if (isRealName) {
+    await supabaseAdmin.from("leads").update({ name }).eq("phone", phone);
+  }
 
   const inserts = [];
 
