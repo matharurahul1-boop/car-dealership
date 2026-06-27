@@ -18,6 +18,7 @@ const INSTALLED_KEY = "pwa-installed";
 export function InstallPWA() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -29,7 +30,9 @@ export function InstallPWA() {
       return;
     }
 
-    setIsIOS(/iphone|ipad|ipod/i.test(navigator.userAgent));
+    const ua = navigator.userAgent;
+    setIsIOS(/iphone|ipad|ipod/i.test(ua));
+    setIsAndroid(/android/i.test(ua));
 
     // Check if previously installed (persisted flag)
     if (localStorage.getItem(INSTALLED_KEY) === "true") {
@@ -195,35 +198,50 @@ export function InstallPWA() {
                   </button>
                 </>
               ) : installPrompt ? (
-                /* Native prompt available — direct install */
+                /* Native prompt available — one-click install */
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="flex-1 py-3 rounded-xl bg-gray-700 text-gray-300 text-sm font-semibold hover:bg-gray-600 transition-colors"
-                  >
+                  <button onClick={() => setShowModal(false)} className="flex-1 py-3 rounded-xl bg-gray-700 text-gray-300 text-sm font-semibold hover:bg-gray-600 transition-colors">
                     Not now
                   </button>
-                  <button
-                    onClick={handleInstall}
-                    className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                  >
+                  <button onClick={handleInstall} className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
                     <Download size={15} /> Install
                   </button>
                 </div>
-              ) : (
-                /* Prompt not fired yet — guide to browser install button */
+              ) : isAndroid ? (
+                /* Android Chrome — menu path */
                 <>
-                  <div className="flex items-start gap-3 bg-[#1e293b] rounded-xl p-4 mb-4">
-                    <div className="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <Download size={14} className="text-blue-400" />
-                    </div>
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      Click the <strong className="text-white">install icon <Download size={12} className="inline" /></strong> in your browser&apos;s address bar to install the app.
-                    </p>
+                  <p className="text-gray-400 text-xs mb-3 text-center">Install via Chrome menu:</p>
+                  <div className="space-y-2 mb-5">
+                    {[
+                      <><strong className="text-white">Tap ⋮</strong> (three dots) at the top right</>,
+                      <>Tap <strong className="text-white">"Add to Home screen"</strong></>,
+                      <>Tap <strong className="text-white">"Add"</strong> to confirm</>,
+                    ].map((text, i) => (
+                      <div key={i} className="flex items-center gap-2.5">
+                        <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                        <p className="text-gray-300 text-sm">{text}</p>
+                      </div>
+                    ))}
                   </div>
-                  <button onClick={() => setShowModal(false)} className="w-full py-3 rounded-xl bg-gray-700 text-white text-sm font-semibold hover:bg-gray-600 transition-colors">
-                    Got it
-                  </button>
+                  <button onClick={() => setShowModal(false)} className="w-full py-3 rounded-xl bg-gray-700 text-white text-sm font-semibold hover:bg-gray-600 transition-colors">Got it</button>
+                </>
+              ) : (
+                /* Desktop Chrome — menu path */
+                <>
+                  <p className="text-gray-400 text-xs mb-3 text-center">Install via Chrome menu:</p>
+                  <div className="space-y-2 mb-5">
+                    {[
+                      <><strong className="text-white">Click ⋮</strong> (three dots) at the top right of Chrome</>,
+                      <>Click <strong className="text-white">"Save and share"</strong></>,
+                      <>Click <strong className="text-white">"Install Handysolver Car Dealership…"</strong></>,
+                    ].map((text, i) => (
+                      <div key={i} className="flex items-center gap-2.5">
+                        <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                        <p className="text-gray-300 text-sm">{text}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setShowModal(false)} className="w-full py-3 rounded-xl bg-gray-700 text-white text-sm font-semibold hover:bg-gray-600 transition-colors">Got it</button>
                 </>
               )}
             </div>
