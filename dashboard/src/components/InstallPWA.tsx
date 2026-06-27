@@ -34,10 +34,31 @@ export function InstallPWA() {
     setIsIOS(/iphone|ipad|ipod/i.test(ua));
     setIsAndroid(/android/i.test(ua));
 
-    // Check if previously installed (persisted flag)
-    if (localStorage.getItem(INSTALLED_KEY) === "true") {
+    // Verify install state: use getInstalledRelatedApps if available,
+    // otherwise fall back to localStorage. This catches the case where
+    // the user uninstalled the app — no browser "uninstall" event exists.
+    const verifyInstalled = async () => {
+      const storedInstalled = localStorage.getItem(INSTALLED_KEY) === "true";
+      if (!storedInstalled) return; // nothing to verify
+
+      if ("getInstalledRelatedApps" in navigator) {
+        try {
+          const apps = await (navigator as unknown as {
+            getInstalledRelatedApps: () => Promise<{ platform: string }[]>
+          }).getInstalledRelatedApps();
+          const stillInstalled = apps.some((a) => a.platform === "webapp");
+          if (!stillInstalled) {
+            localStorage.removeItem(INSTALLED_KEY);
+            setIsInstalled(false);
+            return;
+          }
+        } catch {
+          // API failed — trust localStorage
+        }
+      }
       setIsInstalled(true);
-    }
+    };
+    verifyInstalled();
 
     // Pick up prompt captured by early inline script
     if (window.__installPrompt) {
@@ -48,7 +69,7 @@ export function InstallPWA() {
       e.preventDefault();
       window.__installPrompt = e as BeforeInstallPromptEvent;
       setInstallPrompt(e as BeforeInstallPromptEvent);
-      // If prompt fires again, app was uninstalled — clear flag
+      // beforeinstallprompt fires = app not installed — clear flag
       setIsInstalled(false);
       localStorage.removeItem(INSTALLED_KEY);
     };
