@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
-import { CheckCircle, Copy, ExternalLink, Database, MessageCircle, Zap, Github, Bot } from "lucide-react";
+import { CheckCircle, Copy, ExternalLink, Database, MessageCircle, Zap, Github, Bot, Bell } from "lucide-react";
 
 function CopyRow({ label, value, masked }: { label: string; value: string; masked?: boolean }) {
   const [copied, setCopied] = useState(false);
@@ -32,10 +32,56 @@ function StatusDot({ ok = true }: { ok?: boolean }) {
   return <span className={`inline-block w-2 h-2 rounded-full ${ok ? "bg-green-500" : "bg-red-500"}`} />;
 }
 
+const HOURS_OPTIONS = [
+  { value: 1,  label: "1 hour before" },
+  { value: 2,  label: "2 hours before" },
+  { value: 6,  label: "6 hours before" },
+  { value: 12, label: "12 hours before" },
+  { value: 24, label: "24 hours before (1 day)" },
+  { value: 48, label: "48 hours before (2 days)" },
+];
+
 export default function SettingsPage() {
   const { toast } = useToast();
   const [testing, setTesting] = useState(false);
   const [testPhone, setTestPhone] = useState("");
+
+  // Reminder settings state
+  const [reminderEnabled, setReminderEnabled] = useState(true);
+  const [reminderHours, setReminderHours] = useState(24);
+  const [reminderMessage, setReminderMessage] = useState(
+    "Hi {name}! 🚗 Reminder: your test drive for {car} is scheduled for {date} at {time}. See you at Handysolver Car Dealership!"
+  );
+  const [savingReminder, setSavingReminder] = useState(false);
+  const [loadingReminder, setLoadingReminder] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/reminder-settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.error) {
+          setReminderEnabled(d.enabled);
+          setReminderHours(d.hoursBefore);
+          setReminderMessage(d.message);
+        }
+      })
+      .finally(() => setLoadingReminder(false));
+  }, []);
+
+  const saveReminderSettings = async () => {
+    setSavingReminder(true);
+    try {
+      const res = await fetch("/api/reminder-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: reminderEnabled, hoursBefore: reminderHours, message: reminderMessage }),
+      });
+      if (res.ok) toast("Reminder settings saved", "success");
+      else toast("Failed to save settings", "error");
+    } finally {
+      setSavingReminder(false);
+    }
+  };
 
   const testWhatsApp = async () => {
     if (!testPhone) { toast("Enter a phone number first", "error"); return; }
@@ -175,6 +221,92 @@ export default function SettingsPage() {
             <CopyRow label="Provider" value="Groq" />
             <CopyRow label="Model" value="llama-3.1-8b-instant" />
             <CopyRow label="API Key" value="Stored securely in environment variables" />
+          </CardContent>
+        </Card>
+
+        {/* Reminders */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-blue-50 rounded-lg"><Bell size={16} className="text-blue-600" /></div>
+                <h2 className="font-semibold text-[var(--text)]">Test Drive Reminders</h2>
+              </div>
+              <Badge variant={reminderEnabled ? "success" : "warning"}>
+                {reminderEnabled ? "Enabled" : "Disabled"}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {loadingReminder ? (
+              <p className="text-sm text-[var(--text-muted)] py-2">Loading…</p>
+            ) : (
+              <div className="space-y-4">
+                {/* Toggle */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text)]">Send WhatsApp reminder</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">Auto-send a reminder message before each test drive</p>
+                  </div>
+                  <button
+                    onClick={() => setReminderEnabled((v) => !v)}
+                    className={`relative w-11 h-6 rounded-full transition-colors focus:outline-none ${reminderEnabled ? "bg-blue-600" : "bg-gray-400"}`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${reminderEnabled ? "translate-x-5" : "translate-x-0"}`} />
+                  </button>
+                </div>
+
+                {/* Hours before */}
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Send reminder</label>
+                  <select
+                    value={reminderHours}
+                    onChange={(e) => setReminderHours(Number(e.target.value))}
+                    disabled={!reminderEnabled}
+                    className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm bg-[var(--bg-input)] text-[var(--text)] focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50"
+                  >
+                    {HOURS_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Message template */}
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-1.5">
+                    Message template
+                    <span className="ml-2 text-xs font-normal text-[var(--text-muted)]">
+                      Use {"{name}"}, {"{car}"}, {"{date}"}, {"{time}"}
+                    </span>
+                  </label>
+                  <textarea
+                    value={reminderMessage}
+                    onChange={(e) => setReminderMessage(e.target.value)}
+                    disabled={!reminderEnabled}
+                    rows={3}
+                    className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm bg-[var(--bg-input)] text-[var(--text)] focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50 resize-none"
+                  />
+                  {/* Preview */}
+                  <div className="mt-2 p-3 bg-[var(--bg-muted)] rounded-lg">
+                    <p className="text-xs text-[var(--text-muted)] mb-1">Preview</p>
+                    <p className="text-xs text-[var(--text-sub)]">
+                      {reminderMessage
+                        .replace("{name}", "Rahul")
+                        .replace("{car}", "Nexon EV")
+                        .replace("{date}", "03-07-2026")
+                        .replace("{time}", "10am")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-1">
+                  <Button onClick={saveReminderSettings} loading={savingReminder} size="sm">
+                    Save Reminder Settings
+                  </Button>
+                  <p className="text-xs text-[var(--text-muted)]">Reminders run automatically every hour via Vercel Cron</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
