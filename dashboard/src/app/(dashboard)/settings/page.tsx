@@ -123,7 +123,7 @@ export default function SettingsPage() {
             <div className="mt-3 pt-3 border-t border-[var(--border)]">
               <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Tables</p>
               <div className="flex gap-2 flex-wrap">
-                {["leads", "bookings", "messages"].map((t) => (
+                {["leads", "bookings", "messages", "app_settings", "reminders_log"].map((t) => (
                   <code key={t} className="text-xs bg-[var(--bg-muted)] text-[var(--text-sub)] px-2.5 py-1 rounded-lg">{t}</code>
                 ))}
               </div>
@@ -189,6 +189,7 @@ export default function SettingsPage() {
             <CopyRow label="New Lead Webhook" value="https://n8n-car-dealership.onrender.com/webhook/new-lead" />
             <CopyRow label="WhatsApp Webhook" value="https://n8n-car-dealership.onrender.com/webhook/whatsapp-webhook" />
             <CopyRow label="Dashboard Message Endpoint" value="/api/n8n/message" />
+            <CopyRow label="Reminder Cron Endpoint" value="/api/reminders/run (daily 03:00 UTC / 8:30 AM IST)" />
             <div className="mt-3 pt-3 border-t border-[var(--border)]">
               <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Active Workflows</p>
               <div className="space-y-1.5">
@@ -196,6 +197,7 @@ export default function SettingsPage() {
                   "1. Meta Webhook Verify",
                   "2. New Lead Webhook",
                   "3. WhatsApp Reply Handler (Groq AI)",
+                  "4. Sync to Dashboard (saves leads, messages, bookings)",
                   "5. Keep Server Warm (every 10 min)",
                   "6. Same Day Reminder (9 AM IST)",
                 ].map((w) => (
