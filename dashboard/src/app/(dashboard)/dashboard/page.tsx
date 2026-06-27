@@ -69,9 +69,9 @@ export default function DashboardPage() {
           ) : (
             <>
               <StatsCard title="Total Leads" value={stats?.totalLeads ?? 0} subtitle={`${stats?.newLeadsToday ?? 0} new today`} icon={Users} iconColor="text-blue-500" color="blue" />
-              <StatsCard title="Bookings This Week" value={stats?.bookingsThisWeek ?? 0} subtitle={`${stats?.bookingsToday ?? 0} today`} icon={CalendarCheck} iconColor="text-green-500" color="green" />
+              <StatsCard title="Bookings This Week" value={stats?.bookingsThisWeek ?? 0} subtitle={`${stats?.bookingsToday ?? 0} today`} icon={CalendarCheck} iconColor="text-orange-500" color="orange" />
               <StatsCard title="Active Conversations" value={stats?.activeConversations ?? 0} subtitle="Contacted + Qualified" icon={MessageCircle} iconColor="text-purple-500" color="purple" />
-              <StatsCard title="Conversion Rate" value={`${stats?.conversionRate ?? 0}%`} subtitle="Lead → Booking" icon={TrendingUp} iconColor="text-orange-500" color="orange" />
+              <StatsCard title="Conversion Rate" value={`${stats?.conversionRate ?? 0}%`} subtitle="Lead → Booking" icon={TrendingUp} iconColor="text-green-500" color="green" />
               <StatsCard title="Test Drives Today" value={todayBookings.length} subtitle="Confirmed appointments" icon={Car} iconColor="text-cyan-500" color="cyan" />
               <StatsCard title="New Leads Today" value={stats?.newLeadsToday ?? 0} subtitle="Via WhatsApp" icon={Clock} iconColor="text-pink-500" color="pink" />
             </>
