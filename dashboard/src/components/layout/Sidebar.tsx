@@ -9,12 +9,12 @@ import {
   Settings, Car, LogOut, Menu, X, AlertTriangle,
 } from "lucide-react";
 
-const navItems = [
-  { href: "/dashboard",      label: "Dashboard",      icon: LayoutDashboard },
-  { href: "/leads",          label: "Leads",          icon: Users },
-  { href: "/bookings",       label: "Bookings",       icon: CalendarCheck },
-  { href: "/conversations",  label: "Conversations",  icon: MessageCircle },
-  { href: "/settings",       label: "Settings",       icon: Settings },
+const allNavItems = [
+  { href: "/dashboard",      label: "Dashboard",      icon: LayoutDashboard, roles: null },
+  { href: "/leads",          label: "Leads",          icon: Users,            roles: null },
+  { href: "/bookings",       label: "Bookings",       icon: CalendarCheck,    roles: null },
+  { href: "/conversations",  label: "Conversations",  icon: MessageCircle,    roles: null },
+  { href: "/settings",       label: "Settings",       icon: Settings,         roles: ["admin", "manager"] },
 ];
 
 export function Sidebar() {
@@ -23,16 +23,27 @@ export function Sidebar() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("Admin");
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       if (data.user) {
         setUserEmail(data.user.email || "");
         const name = data.user.user_metadata?.full_name || data.user.email?.split("@")[0] || "Admin";
         setUserName(name);
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .single();
+        setUserRole(profile?.role || null);
       }
     });
   }, []);
+
+  const navItems = allNavItems.filter(
+    (item) => !item.roles || (userRole && item.roles.includes(userRole))
+  );
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
