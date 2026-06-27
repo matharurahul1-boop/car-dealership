@@ -135,7 +135,12 @@ export default function ConversationsPage() {
             ) : filtered.map((c) => (
               <button
                 key={c.phone}
-                onClick={() => setSelected(c)}
+                onClick={() => {
+                  setSelected(c);
+                  setConversations((prev) =>
+                    prev.map((conv) => conv.phone === c.phone ? { ...conv, unread: 0 } : conv)
+                  );
+                }}
                 className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--bg)] transition-colors ${selected?.phone === c.phone ? "bg-blue-600/10 border-l-2 border-l-blue-600" : ""}`}
               >
                 <div className="flex items-center gap-2.5">
