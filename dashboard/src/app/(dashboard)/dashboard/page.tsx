@@ -68,12 +68,12 @@ export default function DashboardPage() {
             Array.from({ length: 6 }).map((_, i) => <StatsCardSkeleton key={i} />)
           ) : (
             <>
-              <StatsCard title="Total Leads" value={stats?.totalLeads ?? 0} subtitle={`${stats?.newLeadsToday ?? 0} new today`} icon={Users} iconColor="text-blue-600" iconBg="bg-blue-50" />
-              <StatsCard title="Bookings This Week" value={stats?.bookingsThisWeek ?? 0} subtitle={`${stats?.bookingsToday ?? 0} today`} icon={CalendarCheck} iconColor="text-green-600" iconBg="bg-green-50" />
-              <StatsCard title="Active Conversations" value={stats?.activeConversations ?? 0} subtitle="Contacted + Qualified" icon={MessageCircle} iconColor="text-purple-600" iconBg="bg-purple-50" />
-              <StatsCard title="Conversion Rate" value={`${stats?.conversionRate ?? 0}%`} subtitle="Lead → Booking" icon={TrendingUp} iconColor="text-orange-600" iconBg="bg-orange-50" />
-              <StatsCard title="Test Drives Today" value={todayBookings.length} subtitle="Confirmed appointments" icon={Car} iconColor="text-cyan-600" iconBg="bg-cyan-50" />
-              <StatsCard title="New Leads Today" value={stats?.newLeadsToday ?? 0} subtitle="Via WhatsApp" icon={Clock} iconColor="text-pink-600" iconBg="bg-pink-50" />
+              <StatsCard title="Total Leads" value={stats?.totalLeads ?? 0} subtitle={`${stats?.newLeadsToday ?? 0} new today`} icon={Users} iconColor="text-blue-500" color="blue" />
+              <StatsCard title="Bookings This Week" value={stats?.bookingsThisWeek ?? 0} subtitle={`${stats?.bookingsToday ?? 0} today`} icon={CalendarCheck} iconColor="text-green-500" color="green" />
+              <StatsCard title="Active Conversations" value={stats?.activeConversations ?? 0} subtitle="Contacted + Qualified" icon={MessageCircle} iconColor="text-purple-500" color="purple" />
+              <StatsCard title="Conversion Rate" value={`${stats?.conversionRate ?? 0}%`} subtitle="Lead → Booking" icon={TrendingUp} iconColor="text-orange-500" color="orange" />
+              <StatsCard title="Test Drives Today" value={todayBookings.length} subtitle="Confirmed appointments" icon={Car} iconColor="text-cyan-500" color="cyan" />
+              <StatsCard title="New Leads Today" value={stats?.newLeadsToday ?? 0} subtitle="Via WhatsApp" icon={Clock} iconColor="text-pink-500" color="pink" />
             </>
           )}
         </div>

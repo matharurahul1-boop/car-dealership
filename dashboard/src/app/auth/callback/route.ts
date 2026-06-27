@@ -21,8 +21,12 @@ export async function GET(request: NextRequest) {
       }
     );
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(`${origin}/dashboard`);
+    const next = searchParams.get("next") || "/dashboard";
+    if (!error) return NextResponse.redirect(`${origin}${next}`);
+    // Expose the real error so we can diagnose
+    const msg = encodeURIComponent(error.message || error.name || "unknown");
+    return NextResponse.redirect(`${origin}/login?error=callback_failed&detail=${msg}`);
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  return NextResponse.redirect(`${origin}/login?error=no_code`);
 }

@@ -134,7 +134,7 @@ export default function LeadsPage() {
             <button
               key={s}
               onClick={() => { setFilterStatus(s); setPage(1); }}
-              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-[var(--text)]" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-gray-200"}`}
+              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${filterStatus === s ? "bg-blue-600 text-white" : "bg-[var(--bg-muted)] text-[var(--text-sub)] hover:bg-[var(--bg-hover)]"}`}
             >
               {s} ({s === "all" ? leads.length : counts[s as LeadStatus] ?? 0})
             </button>
@@ -145,7 +145,7 @@ export default function LeadsPage() {
         <div className="px-6 pt-3 pb-3">
           <div className="relative max-w-sm">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-            <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search name, phone, interest…" className="w-full pl-8 pr-4 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400" />
+            <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search name, phone, interest…" className="w-full pl-8 pr-4 py-2 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[var(--bg-input)] text-[var(--text)] placeholder:text-[var(--text-muted)]" />
           </div>
         </div>
 
