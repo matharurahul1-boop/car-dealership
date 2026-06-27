@@ -88,9 +88,11 @@ export async function GET() {
 
   const sentIds = new Set((sentLog ?? []).map((r: { booking_id: string }) => r.booking_id));
 
-  // For day-based reminders (>=24h): find bookings on the target date regardless of time
-  // For hour-based reminders (<24h): find bookings within a ±1h window today
+  // Exact time-based: reminder fires when (booking_time - hoursBefore) is within ±15 min of now
+  // Bookings are in IST (UTC+5:30), so we add 5.5h to convert booking local time → UTC
+  const IST_MS = 5.5 * 60 * 60 * 1000;
   const now = new Date();
+  const WINDOW_MS = 15 * 60 * 1000; // ±15 minutes
   const sent: string[] = [];
 
   for (const booking of bookings ?? []) {
@@ -99,32 +101,22 @@ export async function GET() {
     const bookingDate = parseBookingDate(booking.date);
     if (!bookingDate) continue;
 
-    let shouldSend = false;
+    const bookingTime = parseBookingTime(booking.time);
+    if (!bookingTime) continue;
 
-    if (hoursBefore >= 24) {
-      // Check if booking is on the target day (days ahead = hoursBefore / 24, rounded)
-      const daysAhead = Math.round(hoursBefore / 24);
-      const targetDate = new Date(now);
-      targetDate.setDate(targetDate.getDate() + daysAhead);
-      shouldSend =
-        bookingDate.getFullYear() === targetDate.getFullYear() &&
-        bookingDate.getMonth() === targetDate.getMonth() &&
-        bookingDate.getDate() === targetDate.getDate();
-    } else {
-      // Hour-based: check if booking datetime is within ±1h of the reminder window
-      const bookingTime = parseBookingTime(booking.time);
-      if (bookingTime) {
-        const bookingDateTime = new Date(
-          bookingDate.getFullYear(), bookingDate.getMonth(), bookingDate.getDate(),
-          bookingTime.hours, bookingTime.minutes
-        );
-        const windowStart = new Date(now.getTime() + (hoursBefore - 1) * 3600000);
-        const windowEnd = new Date(now.getTime() + (hoursBefore + 1) * 3600000);
-        shouldSend = bookingDateTime >= windowStart && bookingDateTime <= windowEnd;
-      }
-    }
+    // Booking datetime in IST (treated as local), convert to UTC
+    const bookingIST = new Date(
+      bookingDate.getFullYear(), bookingDate.getMonth(), bookingDate.getDate(),
+      bookingTime.hours, bookingTime.minutes
+    );
+    const bookingUTC = new Date(bookingIST.getTime() - IST_MS);
 
-    if (shouldSend) {
+    // When should the reminder fire? bookingUTC - hoursBefore
+    const reminderFireAt = new Date(bookingUTC.getTime() - hoursBefore * 3600000);
+
+    // Send if now is within ±15 min of the reminder fire time
+    const diff = Math.abs(now.getTime() - reminderFireAt.getTime());
+    if (diff <= WINDOW_MS) {
       const message = messageTemplate
         .replace("{name}", booking.name || booking.phone)
         .replace("{car}", booking.car || "your chosen car")

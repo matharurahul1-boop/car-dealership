@@ -200,6 +200,7 @@ export default function SettingsPage() {
                   "4. Sync to Dashboard (saves leads, messages, bookings)",
                   "5. Keep Server Warm (every 10 min)",
                   "6. Same Day Reminder (9 AM IST)",
+                  "7. Test Drive Reminder Checker (every 30 min)",
                 ].map((w) => (
                   <div key={w} className="flex items-center gap-2">
                     <StatusDot />
@@ -265,10 +266,11 @@ export default function SettingsPage() {
                     value={reminderHours}
                     onChange={(e) => setReminderHours(Number(e.target.value))}
                     disabled={!reminderEnabled}
-                    className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm bg-[var(--bg-input)] text-[var(--text)] focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50"
+                    className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50"
+                    style={{ background: "#1e293b", color: "#f1f5f9" }}
                   >
                     {HOURS_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
+                      <option key={o.value} value={o.value} style={{ background: "#1e293b", color: "#f1f5f9" }}>{o.label}</option>
                     ))}
                   </select>
                 </div>
@@ -305,7 +307,7 @@ export default function SettingsPage() {
                   <Button onClick={saveReminderSettings} loading={savingReminder} size="sm">
                     Save Reminder Settings
                   </Button>
-                  <p className="text-xs text-[var(--text-muted)]">Reminders run automatically daily at 8:30 AM IST via Vercel Cron</p>
+                  <p className="text-xs text-[var(--text-muted)]">Reminders checked every 30 min via n8n — sends exactly X hours before the test drive</p>
                 </div>
               </div>
             )}
