@@ -16,7 +16,7 @@ export function Header({ title, subtitle, onRefresh, refreshing, actions }: Head
 
   return (
     <div
-      className="flex items-center justify-between pl-14 lg:pl-6 pr-3 sm:pr-6 py-3 sm:py-4 border-b shrink-0 gap-2"
+      className="flex items-center justify-between pl-4 sm:pl-6 pr-3 sm:pr-6 py-3 sm:py-4 border-b shrink-0 gap-2"
       style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}
     >
       <div className="min-w-0">
