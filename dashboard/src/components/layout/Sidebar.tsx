@@ -236,6 +236,13 @@ export function Sidebar() {
             </Link>
           );
         })}
+        <button
+          onClick={() => setShowConfirm(true)}
+          className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium text-gray-500 hover:text-red-400 transition-colors"
+        >
+          <LogOut size={20} strokeWidth={1.8} />
+          <span>Sign out</span>
+        </button>
       </nav>
 
       {/* Sign out confirmation */}
