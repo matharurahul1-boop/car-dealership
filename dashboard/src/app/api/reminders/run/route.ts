@@ -114,9 +114,10 @@ export async function GET() {
     // When should the reminder fire? bookingUTC - hoursBefore
     const reminderFireAt = new Date(bookingUTC.getTime() - hoursBefore * 3600000);
 
-    // Send if now is within ±15 min of the reminder fire time
-    const diff = Math.abs(now.getTime() - reminderFireAt.getTime());
-    if (diff <= WINDOW_MS) {
+    // Send if reminder fire time has passed within the last 30 minutes
+    // (covers bookings created after the previous cron run)
+    const pastWindow = new Date(now.getTime() - 30 * 60 * 1000);
+    if (reminderFireAt <= now && reminderFireAt >= pastWindow) {
       const message = messageTemplate
         .replace("{name}", booking.name || booking.phone)
         .replace("{car}", booking.car || "your chosen car")
