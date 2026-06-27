@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useState, useEffect, useRef } from "react";
 import {
   LayoutDashboard, Users, CalendarCheck, MessageCircle,
-  Settings, Car, LogOut, AlertTriangle, PanelLeftClose, PanelLeftOpen,
+  Settings, Car, LogOut, AlertTriangle, PanelLeftClose, PanelLeftOpen, ChevronLeft,
 } from "lucide-react";
 
 const allNavItems = [
@@ -93,19 +93,28 @@ export function Sidebar() {
           expanded ? "w-64" : "w-[60px]"
         )}
       >
-        {/* Logo */}
+        {/* Logo — hover shows ‹ collapse arrow when expanded (Supabase style) */}
         <div className={cn(
-          "flex items-center h-[70px] border-b border-gray-700 shrink-0 gap-3",
+          "group flex items-center h-[70px] border-b border-gray-700 shrink-0 gap-3",
           expanded ? "px-4" : "justify-center"
         )}>
           <div className="bg-blue-600 rounded-lg p-2 shrink-0">
             <Car size={18} className="text-white" />
           </div>
           {expanded && (
-            <div className="min-w-0 flex-1">
-              <p className="text-white font-semibold text-sm leading-tight">Handysolver</p>
-              <p className="text-gray-400 text-xs">Car Dealership</p>
-            </div>
+            <>
+              <div className="min-w-0 flex-1">
+                <p className="text-white font-semibold text-sm leading-tight">Handysolver</p>
+                <p className="text-gray-400 text-xs">Car Dealership</p>
+              </div>
+              <button
+                onClick={() => setModeAndSave("collapsed")}
+                title="Collapse sidebar"
+                className="shrink-0 p-1.5 rounded-md text-gray-600 hover:text-white hover:bg-gray-800 opacity-0 group-hover:opacity-100 transition-all duration-150"
+              >
+                <ChevronLeft size={15} />
+              </button>
+            </>
           )}
         </div>
 
@@ -167,38 +176,40 @@ export function Sidebar() {
           </button>
         </div>
 
-        {/* Sidebar control — bottom toggle */}
+        {/* Sidebar control — bottom, Supabase style */}
         <div className="relative border-t border-gray-700 px-2 py-2 shrink-0" ref={menuRef}>
           <button
             onClick={() => setShowModeMenu((v) => !v)}
             title="Sidebar control"
             className={cn(
-              "flex items-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors",
-              expanded ? "gap-2 px-3 py-2 w-full text-sm" : "justify-center p-3 w-full"
+              "flex items-center rounded-lg text-gray-500 hover:text-white hover:bg-gray-800 transition-colors w-full",
+              expanded ? "gap-2.5 px-3 py-2 text-sm" : "justify-center p-3"
             )}
           >
             {mode === "expanded"
-              ? <PanelLeftClose size={16} />
-              : <PanelLeftOpen size={16} />}
+              ? <PanelLeftClose size={15} />
+              : <PanelLeftOpen size={15} />}
             {expanded && <span>Sidebar control</span>}
           </button>
 
-          {/* Mode popover */}
+          {/* Mode popover — opens upward */}
           {showModeMenu && (
-            <div className="absolute bottom-full left-2 mb-1 w-48 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50">
+            <div className="absolute bottom-full left-0 mb-2 w-52 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50">
+              <p className="px-4 pt-3 pb-1 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Sidebar control</p>
               {modeOptions.map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => setModeAndSave(key)}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-700 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-700/60 transition-colors"
                 >
                   <span className={cn(
-                    "w-2 h-2 rounded-full border-2 shrink-0",
-                    mode === key ? "border-blue-400 bg-blue-400" : "border-gray-500"
+                    "w-2 h-2 rounded-full shrink-0 border-2",
+                    mode === key ? "bg-blue-400 border-blue-400" : "border-gray-600"
                   )} />
                   <span className={mode === key ? "text-white font-medium" : "text-gray-400"}>{label}</span>
                 </button>
               ))}
+              <div className="h-2" />
             </div>
           )}
         </div>
