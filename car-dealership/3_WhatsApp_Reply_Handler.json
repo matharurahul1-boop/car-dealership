@@ -253,6 +253,22 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [832, 256]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://car-dealership-xi-rouge.vercel.app/api/n8n/message",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ phone: $('Check Message Type').first().json.phone, name: 'WA-' + $('Check Message Type').first().json.phone, inbound_text: $('Check Message Type').first().json.message, outbound_text: $('Parse Response').first().json.message, booking: $('Parse Response').first().json.hasBooking ? $('Parse Response').first().json.booking : null }) }}",
+        "options": {}
+      },
+      "id": "dashboard-sync-0001-0001-0001",
+      "name": "Sync to Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1696, 256],
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -270,7 +286,8 @@
     "Build Gemini Request": { "main": [[{ "node": "Groq AI", "type": "main", "index": 0 }]] },
     "Groq AI": { "main": [[{ "node": "Parse Response", "type": "main", "index": 0 }]] },
     "Parse Response": { "main": [[{ "node": "Save History", "type": "main", "index": 0 }]] },
-    "Save History": { "main": [[{ "node": "Has Booking?", "type": "main", "index": 0 }]] },
+    "Save History": { "main": [[{ "node": "Sync to Dashboard", "type": "main", "index": 0 }, { "node": "Has Booking?", "type": "main", "index": 0 }]] },
+    "Sync to Dashboard": { "main": [] },
     "Has Booking?": {
       "main": [
         [{ "node": "Send Processing Msg", "type": "main", "index": 0 }],
