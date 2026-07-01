@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-01T09:41:39.129Z",
+  "updatedAt": "2026-07-01T09:51:44.702Z",
   "createdAt": "2026-06-25T19:00:33.430Z",
   "id": "KpQWF3OSLckjAbCt",
   "name": "WhatsApp Reply Handler",
@@ -268,7 +268,10 @@
       "position": [
         0,
         0
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {
@@ -276,7 +279,7 @@
         "url": "https://script.google.com/macros/s/AKfycbzoYisQi9UxCYe7NBypqS3jQTAWOkGgfvyLF09Rkb_XX34AN6MTfbQpsbZk03uIpLCs/exec",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"action\": \"saveBooking\",\n  \"name\": \"WA-{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"phone\": \"{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"car\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.car : '' }}\",\n  \"date\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.date : '' }}\",\n  \"time\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.time : '' }}\"\n}",
+        "jsonBody": "={\n  \"action\": \"saveBooking\",\n  \"name\": \"{{ $('Build Groq Request').item.json.customerName || ('WA-' + $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from) }}\",\n  \"phone\": \"{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"car\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.car : '' }}\",\n  \"date\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.date : '' }}\",\n  \"time\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.time : '' }}\"\n}",
         "options": {}
       },
       "id": "73f0e3c0-65ef-4c14-801b-13f1a2025a4b",
@@ -353,7 +356,10 @@
       "position": [
         160,
         272
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {
@@ -398,7 +404,10 @@
       "position": [
         -1344,
         272
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {
@@ -417,7 +426,10 @@
         -480,
         272
       ],
-      "onError": "continueRegularOutput"
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {
@@ -619,47 +631,8 @@
   },
   "staticData": {
     "global": {
-      "processedMessages": {
-        "wamid.HBgMOTE3MDU4NDQ0ODA4FQIAEhgWM0VCMDcxQzg4MzFCODgzNzA2RTBBNAA=": 1782898960935,
-        "wamid.HBgMOTE3MDU4NDQ0ODA4FQIAEhgWM0VCMDhDRDVFMjdDRjEyRTJFMEM0QwA=": 1782898996134,
-        "wamid.HBgMOTE3MDU4NDQ0ODA4FQIAEhgWM0VCMDYxRTY4RjREQjU2MkRCMkFGRgA=": 1782899044735
-      },
-      "conversations": {
-        "917058444808": [
-          {
-            "role": "user",
-            "message": "CLEAR_ALL_DATA_9999"
-          },
-          {
-            "role": "assistant",
-            "message": "✅ All data cleared! System reset complete. Send Hi to start fresh."
-          },
-          {
-            "role": "user",
-            "message": "Hi"
-          },
-          {
-            "role": "assistant",
-            "message": "Hey! What can I help you with?"
-          },
-          {
-            "role": "user",
-            "message": "Book a test drive tomorrow at 4pm for mercedes benz"
-          },
-          {
-            "role": "assistant",
-            "message": "Perfect, I've booked a test drive for Mercedes Benz tomorrow at 4pm. See you then!"
-          },
-          {
-            "role": "user",
-            "message": "What is my name?"
-          },
-          {
-            "role": "assistant",
-            "message": "I don't know your name yet."
-          }
-        ]
-      },
+      "processedMessages": {},
+      "conversations": {},
       "lastBookings": {},
       "customerNames": {},
       "_pendingIsFirst": false,
@@ -668,9 +641,9 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "8eb42eb3-2b22-431b-922d-be5e66637aae",
-  "activeVersionId": "8eb42eb3-2b22-431b-922d-be5e66637aae",
-  "versionCounter": 238,
+  "versionId": "7d31649e-b5a3-48d2-9a79-23fd7e642bb9",
+  "activeVersionId": "7d31649e-b5a3-48d2-9a79-23fd7e642bb9",
+  "versionCounter": 248,
   "triggerCount": 1,
   "shared": [
     {
@@ -693,9 +666,9 @@
   ],
   "tags": [],
   "activeVersion": {
-    "updatedAt": "2026-07-01T09:41:39.629Z",
-    "createdAt": "2026-07-01T09:41:39.629Z",
-    "versionId": "8eb42eb3-2b22-431b-922d-be5e66637aae",
+    "updatedAt": "2026-07-01T09:51:44.730Z",
+    "createdAt": "2026-07-01T09:51:44.730Z",
+    "versionId": "7d31649e-b5a3-48d2-9a79-23fd7e642bb9",
     "workflowId": "KpQWF3OSLckjAbCt",
     "nodes": [
       {
@@ -871,7 +844,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const phone = $('Check Message Type').first().json.phone;\nconst userMessage = $('Check Message Type').first().json.message;\nconst aiResponse = $('Parse Response').first().json.message;\nconst stage = $('Parse Response').first().json.stage;\nconst booking = $('Parse Response').first().json.booking;\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.conversations) staticData.conversations = {};\nif (!staticData.lastBookings) staticData.lastBookings = {};\nif (!staticData.conversations[phone]) staticData.conversations[phone] = [];\n\nstaticData.conversations[phone].push({ role: 'user', message: userMessage });\nstaticData.conversations[phone].push({ role: 'assistant', message: aiResponse });\n\n// Save customer name if AI extracted it this turn\nconst detectedName = $('Parse Response').first().json.customerName;\nif (detectedName) {\n  if (!staticData.customerNames) staticData.customerNames = {};\n  staticData.customerNames[phone] = detectedName;\n}\n\nif (staticData.conversations[phone].length > 40) {\n  staticData.conversations[phone] = staticData.conversations[phone].slice(-40);\n}\n\nif (stage === 'confirmed' && booking && booking.car && booking.date && booking.time) {\n  staticData.lastBookings[phone] = {\n    car: booking.car,\n    date: booking.date,\n    time: booking.time,\n    confirmedAt: new Date().toISOString()\n  };\n  staticData.conversations[phone] = staticData.conversations[phone].slice(-6);\n}\n\nreturn [{ json: { saved: true, historyLength: staticData.conversations[phone].length } }];"
+          "jsCode": "// Skip saving reset/admin commands to history\nconst skipCommands = ['/reset', 'RESET_SESSION', 'CLEAR_ALL_DATA_9999'];\nif (skipCommands.includes(userMessage.trim()) || skipCommands.includes(userMessage.trim().toLowerCase())) {\n  return [{ json: { saved: false } }];\n}\n\nconst phone = $('Check Message Type').first().json.phone;\nconst userMessage = $('Check Message Type').first().json.message;\nconst aiResponse = $('Parse Response').first().json.message;\nconst stage = $('Parse Response').first().json.stage;\nconst booking = $('Parse Response').first().json.booking;\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.conversations) staticData.conversations = {};\nif (!staticData.lastBookings) staticData.lastBookings = {};\nif (!staticData.conversations[phone]) staticData.conversations[phone] = [];\n\nstaticData.conversations[phone].push({ role: 'user', message: userMessage });\nstaticData.conversations[phone].push({ role: 'assistant', message: aiResponse });\n\n// Save customer name if AI extracted it this turn\nconst detectedName = $('Parse Response').first().json.customerName;\nif (detectedName) {\n  if (!staticData.customerNames) staticData.customerNames = {};\n  staticData.customerNames[phone] = detectedName;\n}\n\nif (staticData.conversations[phone].length > 40) {\n  staticData.conversations[phone] = staticData.conversations[phone].slice(-40);\n}\n\nif (stage === 'confirmed' && booking && booking.car && booking.date && booking.time) {\n  staticData.lastBookings[phone] = {\n    car: booking.car,\n    date: booking.date,\n    time: booking.time,\n    confirmedAt: new Date().toISOString()\n  };\n  staticData.conversations[phone] = staticData.conversations[phone].slice(-6);\n}\n\nreturn [{ json: { saved: true, historyLength: staticData.conversations[phone].length } }];"
         },
         "id": "f13312bb-10e9-428d-bf86-d6ce988e84a2",
         "name": "Save History",
@@ -946,7 +919,7 @@
               },
               {
                 "name": "text",
-                "value": "={{ ({body: \"Just a moment... ?\"}) }}"
+                "value": "={{ ({body: \"Just a moment... ⏳\"}) }}"
               }
             ]
           },
@@ -959,7 +932,10 @@
         "position": [
           0,
           0
-        ]
+        ],
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
       },
       {
         "parameters": {
@@ -967,7 +943,7 @@
           "url": "https://script.google.com/macros/s/AKfycbzoYisQi9UxCYe7NBypqS3jQTAWOkGgfvyLF09Rkb_XX34AN6MTfbQpsbZk03uIpLCs/exec",
           "sendBody": true,
           "specifyBody": "json",
-          "jsonBody": "={\n  \"action\": \"saveBooking\",\n  \"name\": \"WA-{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"phone\": \"{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"car\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.car : '' }}\",\n  \"date\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.date : '' }}\",\n  \"time\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.time : '' }}\"\n}",
+          "jsonBody": "={\n  \"action\": \"saveBooking\",\n  \"name\": \"{{ $('Build Groq Request').item.json.customerName || ('WA-' + $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from) }}\",\n  \"phone\": \"{{ $('WhatsApp Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}\",\n  \"car\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.car : '' }}\",\n  \"date\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.date : '' }}\",\n  \"time\": \"{{ $('Parse Response').item.json.hasBooking ? $('Parse Response').item.json.booking.time : '' }}\"\n}",
           "options": {}
         },
         "id": "73f0e3c0-65ef-4c14-801b-13f1a2025a4b",
@@ -1044,7 +1020,10 @@
         "position": [
           160,
           272
-        ]
+        ],
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
       },
       {
         "parameters": {
@@ -1089,7 +1068,10 @@
         "position": [
           -1344,
           272
-        ]
+        ],
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
       },
       {
         "parameters": {
@@ -1108,11 +1090,14 @@
           -480,
           272
         ],
-        "onError": "continueRegularOutput"
+        "onError": "continueRegularOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
       },
       {
         "parameters": {
-          "jsCode": "const phone = $('Check Message Type').first().json.phone;\nconst currentMessage = $('Check Message Type').first().json.message;\n\n// ── RESET command: clears conversation for this phone ──\nif (currentMessage.trim().toLowerCase() === '/reset' || currentMessage.trim() === 'RESET_SESSION') {\n  const sd = $getWorkflowStaticData('global');\n  if (sd.conversations) delete sd.conversations[phone];\n  if (sd.customerNames) delete sd.customerNames[phone];\n  if (sd.lastBookings) delete sd.lastBookings[phone];\n  const resetKeys = [\"GROQ_KEY_1\",\"GROQ_KEY_2\"];\n  return [{ json: { groqKey: resetKeys[0], body: {\n      model: \"llama-3.3-70b-versatile\",\n      messages: [{ role: \"user\", content: \"Return this exact JSON string and nothing else: {\\\"message\\\":\\\"✅ Session reset! Send Hi to start a fresh conversation.\\\",\\\"stage\\\":\\\"other\\\",\\\"booking\\\":{\\\"car\\\":null,\\\"date\\\":null,\\\"time\\\":null},\\\"customerName\\\":null}\" }],\n      temperature: 0,\n      max_tokens: 80\n    } } }];\n}\n\n// ── CLEAR_ALL: wipes ALL conversation data across all users ──\nif (currentMessage.trim() === 'CLEAR_ALL_DATA_9999') {\n  const sd = $getWorkflowStaticData('global');\n  sd.conversations = {};\n  sd.customerNames = {};\n  sd.lastBookings = {};\n  sd.processedMessages = {};\n  const resetKeysCA = [\"GROQ_KEY_1\"];\n  return [{ json: { groqKey: resetKeysCA[0], body: {\n      model: \"llama-3.3-70b-versatile\",\n      messages: [{ role: \"user\", content: \"Return this exact JSON string and nothing else: {\\\"message\\\":\\\"✅ All data cleared! System reset complete. Send Hi to start fresh.\\\",\\\"stage\\\":\\\"other\\\",\\\"booking\\\":{\\\"car\\\":null,\\\"date\\\":null,\\\"time\\\":null},\\\"customerName\\\":null}\" }],\n      temperature: 0,\n      max_tokens: 80\n    } } }];\n}\n\nconst names = ['Raj','Priya','Amit','Neha','Rahul','Pooja','Vikram','Anjali'];\nconst nameIndex = phone.split('').reduce((sum,c) => sum+c.charCodeAt(0),0) % names.length;\nconst agentName = names[nameIndex];\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.conversations) staticData.conversations = {};\nif (!staticData.lastBookings) staticData.lastBookings = {};\n\nconst history = (staticData.conversations[phone] || [])\n  .filter(m => m.message && m.message.trim().length > 0)\n  .slice(-10);\n\nlet budget = '', carInterest = '', bookingStage = 'initial';\nconst historyText = history.map(m => m.message).join(' ').toLowerCase();\nconst bm = historyText.match(/(\\d+[\\s]*(?:lakh|lac|k|thousand|crore))/);\nif (bm) budget = bm[0];\nconst carBrands = ['maruti','swift','baleno','dzire','wagon','alto','celerio','ignis','ertiga','brezza','vitara','xl6','ciaz','spresso','honda','city','amaze','elevate','jazz','hyundai','creta','i20','venue','verna','aura','alcazar','tucson','ioniq','kona','tata','nexon','harrier','safari','punch','altroz','tiago','tigor','curvv','mahindra','scorpio','xuv','bolero','thar','marazzo','toyota','innova','fortuner','glanza','hyryder','kia','seltos','sonet','carens','ev6','volkswagen','virtus','taigun','skoda','slavia','kushaq','mg','hector','astor','windsor','comet','zsev','jeep','compass','meridian','wrangler','renault','kiger','kwid','triber','duster','nissan','magnite','kicks','bmw','audi','mercedes','volvo','lexus','jaguar','land rover','porsche','citroen','isuzu','byd','force'];\nfor (const b of carBrands) { if (historyText.includes(b)) { carInterest = b; break; } }\nif (historyText.includes('test drive') || historyText.includes('book')) bookingStage = 'booking';\nelse if (historyText.includes('price') || historyText.includes('cost') || historyText.includes('budget')) bookingStage = 'qualification';\nelse if (history.length > 0) bookingStage = 'conversation';\n\nconst isFirstMessage = history.length === 0;\n\n// Resolve stored customer name\nif (!staticData.customerNames) staticData.customerNames = {};\nconst customerName = staticData.customerNames[phone] || null;\n\nconst today = new Date();\nconst todayStr = today.toLocaleDateString('en-IN', {\n  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',\n  timeZone: 'Asia/Kolkata'\n});\n\nconst lastBooking = staticData.lastBookings[phone];\nconst lastBookingInfo = lastBooking\n  ? `CUSTOMER'S LAST CONFIRMED BOOKING: Car = ${lastBooking.car}, Date = ${lastBooking.date}, Time = ${lastBooking.time}. Use this when customer asks about their booking status.`\n  : `No previous booking on record for this customer.`;\n\nconst greetingWords = ['hi','hello','hey','hii','helo','namaste','hola','sup','yo','hai','hei'];\nconst isPureGreeting = greetingWords.includes(currentMessage.trim().toLowerCase());\n\nconst systemPrompt = `You are ${agentName}, a friendly sales agent at Handysolver Car Dealership.\nToday is ${todayStr}.\n\n${lastBookingInfo}\n\nCRITICAL RULES:\n1. ${isFirstMessage ? `FIRST message — greet and ask for name: \"Hi! I'm ${agentName} from Handysolver Car Dealership! 👋 Welcome! May I know your name?\"` : `NOT first message. NEVER say hello or re-introduce yourself. Continue naturally.`}\n2. CUSTOMER NAME: ${customerName ? `Known as \"${customerName}\". Use their name occasionally in replies to make it personal.` : `Unknown. If customer provides their name in this message, extract it and set the customerName field in your JSON output.`}\n3. Context: Budget=${budget||'not mentioned'}, Car Interest=${carInterest||'not mentioned'}, Stage=${bookingStage}\n4. SHORT replies (2-4 lines). Conversational. No bullet points unless listing cars.\n5. Respond in same language as customer (Hindi/Hinglish/English).\n6. ${isPureGreeting && isFirstMessage ? `FIRST greeting - reply ONLY: \"Hello! How can I help you today? ??\" Return booking: {\"car\":null,\"date\":null,\"time\":null} and stage: \"other\".` : isPureGreeting ? `Customer said hi mid-conversation. Reply naturally and warmly (e.g. \"Hey! What can I help you with?\") - do NOT re-introduce yourself. Return booking: {\"car\":null,\"date\":null,\"time\":null} and stage: \"other\".` : `Continue naturally based on context.`}\n\nINVENTORY:\nWe are a multi-brand dealership stocking ALL popular cars available in India across every segment and brand - Maruti Suzuki, Hyundai, Tata, Honda, Kia, Toyota, Mahindra, MG, Skoda, Volkswagen, Renault, Nissan, Jeep, Citroen, Isuzu, BYD, BMW, Audi, Mercedes-Benz, Volvo, and more. New and used cars both available.\n\nPRICE RANGES BY SEGMENT:\n- Hatchbacks: ?3.5L-11L (Alto, Swift, i20, Altroz, Baleno, Wagon R, Tiago, Kwid etc.)\n- Micro SUVs: ?6L-15L (Punch, Magnite, Kiger, XUV 3XO etc.)\n- Sedans: ?6.5L-19L (Dzire, City, Verna, Amaze, Slavia, Virtus etc.)\n- Compact SUVs: ?8L-22L (Nexon, Brezza, Venue, Sonet, Elevate, Kushaq, Taigun, Compass etc.)\n- Mid SUVs: ?11L-25L (Creta, Seltos, Alcazar, Hector, Astor, Grand Vitara etc.)\n- Large SUVs: ?13L-40L (Harrier, Safari, Scorpio N, Thar, Fortuner, Tucson etc.)\n- MPVs: ?6L-30L (Ertiga, Carens, Innova Crysta, Innova HyCross, XL6, Triber etc.)\n- Electric: ?7L-65L+ (Tiago EV, Punch EV, Nexon EV, Windsor EV, ZS EV, Ioniq 5, EV6, BYD Atto 3 etc.)\n- Luxury: ?45L-2Cr+ (BMW, Audi, Mercedes, Volvo, Jaguar, Porsche etc.)\n- Used Cars: Starting ?2L\n\nINVENTORY RULE: Since we stock all popular Indian cars, NEVER say a car is unavailable unless it is not sold in India at all. Use your knowledge of Indian car prices and variants to answer accurately. EMI, exchange, and insurance available on all cars.\n\nBOOKING RULES:\n6. Set booking.car, booking.date, booking.time to non-null ONLY when customer provides ALL THREE in their CURRENT message - car model + specific date (DD-MM-YYYY) + time slot.\n7. When customer agrees to test drive ? ask: \"Perfect! What date works for you, and what time? We're available any time between 9am-9pm ??\"\n8. When customer gives relative date (tomorrow, next Monday etc.) ? calculate exact date from today (${todayStr}) and confirm.\n9. CONFIRMATION: Any affirmative response counts as YES - yes, haan, ok, sure, absolutely, correct, right, exactly, perfect, definitely, of course, bilkul, theek hai, yep, yup, ha.\n10. booking.date must ALWAYS be in DD-MM-YYYY format.\n11. If date is in the past ? say \"That date has passed! Could you pick a future date? ??\"\n\nSTATUS & REPEAT SCENARIOS:\n12. Status questions ? use LAST CONFIRMED BOOKING info to answer.\n13. Cancel request ? say \"I'll have our team cancel your booking. They'll contact you shortly.\"\n14. Reschedule request ? ask for new date/time only.\n\nCUSTOMER HANDLING:\n15. Angry/frustrated ? \"I completely understand your frustration, and I'm sorry for the inconvenience. ??\"\n16. Off-topic ? \"Ha ha! I wish I could help with that ?? But I'm your car expert!\"\n17. Budget under ?3L ? suggest used cars starting ?2L.\n18. NEVER say \"Let me check\" or \"I'll look up\" - answer confidently.\n19. Business hours 9am-9pm. Outside hours ? ask for a slot between 9am-9pm.\n\nOUTPUT RULES - CRITICAL:\n- Return valid JSON only. No extra text.\n- Format: {\"message\":\"reply here\",\"stage\":\"initial|qualification|recommendation|booking|confirmed|other\",\"booking\":{\"car\":null,\"date\":null,\"time\":null},\"customerName\":null}\n- customerName: set to the customer's name (string) if they mentioned it in this message, otherwise null. Never guess.\n- stage = \"confirmed\" ONLY when setting all three booking fields to non-null.\n- booking.time format: \"9am\", \"10am\", \"11am\", \"12pm\", \"1pm\" etc. NEVER 24-hour format.\n- For ALL other messages booking must be: {\"car\":null,\"date\":null,\"time\":null}`;\n\nconst messages = [{ role: 'system', content: systemPrompt }];\nfor (const msg of history) {\n  messages.push({ role: msg.role === 'assistant' ? 'assistant' : 'user', content: msg.message });\n}\nmessages.push({ role: 'user', content: currentMessage });\n\nconst groqKeys = [\n  \"GROQ_KEY_1\",\n  \"GROQ_KEY_2\",\n  \"GROQ_KEY_3\",\n  \"GROQ_KEY_4\",\n  \"GROQ_KEY_5\"\n];\nconst groqKey = groqKeys[Math.floor(Math.random() * groqKeys.length)];\n\nreturn [{\n  json: {\n    groqKey,\n    body: {\n      model: \"llama-3.3-70b-versatile\",\n      messages: messages,\n      temperature: 0.3,\n      max_tokens: 500,\n      response_format: { type: \"json_object\" }\n    }\n  }\n}];"
+          "jsCode": "const phone = $('Check Message Type').first().json.phone;\nconst currentMessage = $('Check Message Type').first().json.message;\n\n// ── RESET command: clears conversation for this phone ──\nif (currentMessage.trim().toLowerCase() === '/reset' || currentMessage.trim() === 'RESET_SESSION') {\n  const sd = $getWorkflowStaticData('global');\n  if (sd.conversations) delete sd.conversations[phone];\n  if (sd.customerNames) delete sd.customerNames[phone];\n  if (sd.lastBookings) delete sd.lastBookings[phone];\n  const resetKeys = [\"GROQ_KEY_1\",\"GROQ_KEY_2\"];\n  return [{ json: { groqKey: resetKeys[0], body: {\n      model: \"llama-3.3-70b-versatile\",\n      messages: [{ role: \"user\", content: \"Return this exact JSON string and nothing else: {\\\"message\\\":\\\"✅ Session reset! Send Hi to start a fresh conversation.\\\",\\\"stage\\\":\\\"other\\\",\\\"booking\\\":{\\\"car\\\":null,\\\"date\\\":null,\\\"time\\\":null},\\\"customerName\\\":null}\" }],\n      temperature: 0,\n      max_tokens: 80\n    } } }];\n}\n\n// ── CLEAR_ALL: wipes ALL conversation data across all users ──\nif (currentMessage.trim() === 'CLEAR_ALL_DATA_9999') {\n  const sd = $getWorkflowStaticData('global');\n  sd.conversations = {};\n  sd.customerNames = {};\n  sd.lastBookings = {};\n  sd.processedMessages = {};\n  const resetKeysCA = [\"GROQ_KEY_1\"];\n  return [{ json: { groqKey: resetKeysCA[0], body: {\n      model: \"llama-3.3-70b-versatile\",\n      messages: [{ role: \"user\", content: \"Return this exact JSON string and nothing else: {\\\"message\\\":\\\"✅ All data cleared! System reset complete. Send Hi to start fresh.\\\",\\\"stage\\\":\\\"other\\\",\\\"booking\\\":{\\\"car\\\":null,\\\"date\\\":null,\\\"time\\\":null},\\\"customerName\\\":null}\" }],\n      temperature: 0,\n      max_tokens: 80\n    } } }];\n}\n\nconst names = ['Raj','Priya','Amit','Neha','Rahul','Pooja','Vikram','Anjali'];\nconst nameIndex = phone.split('').reduce((sum,c) => sum+c.charCodeAt(0),0) % names.length;\nconst agentName = names[nameIndex];\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.conversations) staticData.conversations = {};\nif (!staticData.lastBookings) staticData.lastBookings = {};\n\nconst history = (staticData.conversations[phone] || [])\n  .filter(m => m.message && m.message.trim().length > 0)\n  .slice(-10);\n\nlet budget = '', carInterest = '', bookingStage = 'initial';\nconst historyText = history.map(m => m.message).join(' ').toLowerCase();\nconst bm = historyText.match(/(\\d+[\\s]*(?:lakh|lac|k|thousand|crore))/);\nif (bm) budget = bm[0];\nconst carBrands = ['maruti','swift','baleno','dzire','wagon','alto','celerio','ignis','ertiga','brezza','vitara','xl6','ciaz','spresso','honda','city','amaze','elevate','jazz','hyundai','creta','i20','venue','verna','aura','alcazar','tucson','ioniq','kona','tata','nexon','harrier','safari','punch','altroz','tiago','tigor','curvv','mahindra','scorpio','xuv','bolero','thar','marazzo','toyota','innova','fortuner','glanza','hyryder','kia','seltos','sonet','carens','ev6','volkswagen','virtus','taigun','skoda','slavia','kushaq','mg','hector','astor','windsor','comet','zsev','jeep','compass','meridian','wrangler','renault','kiger','kwid','triber','duster','nissan','magnite','kicks','bmw','audi','mercedes','volvo','lexus','jaguar','land rover','porsche','citroen','isuzu','byd','force'];\nfor (const b of carBrands) { if (historyText.includes(b)) { carInterest = b; break; } }\nif (historyText.includes('test drive') || historyText.includes('book')) bookingStage = 'booking';\nelse if (historyText.includes('price') || historyText.includes('cost') || historyText.includes('budget')) bookingStage = 'qualification';\nelse if (history.length > 0) bookingStage = 'conversation';\n\nconst isFirstMessage = history.length === 0;\n\n// Resolve stored customer name\nif (!staticData.customerNames) staticData.customerNames = {};\nconst customerName = staticData.customerNames[phone] || null;\n\nconst today = new Date();\nconst todayStr = today.toLocaleDateString('en-IN', {\n  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',\n  timeZone: 'Asia/Kolkata'\n});\n\nconst lastBooking = staticData.lastBookings[phone];\nconst lastBookingInfo = lastBooking\n  ? `CUSTOMER'S LAST CONFIRMED BOOKING: Car = ${lastBooking.car}, Date = ${lastBooking.date}, Time = ${lastBooking.time}. Use this when customer asks about their booking status.`\n  : `No previous booking on record for this customer.`;\n\nconst greetingWords = ['hi','hello','hey','hii','helo','namaste','hola','sup','yo','hai','hei'];\nconst isPureGreeting = greetingWords.includes(currentMessage.trim().toLowerCase());\n\nconst systemPrompt = `You are ${agentName}, a friendly sales agent at Handysolver Car Dealership.\nToday is ${todayStr}.\n\n${lastBookingInfo}\n\nCRITICAL RULES:\n1. ${isFirstMessage ? `FIRST message — greet and ask for name: \"Hi! I'm ${agentName} from Handysolver Car Dealership! 👋 Welcome! May I know your name?\"` : `NOT first message. NEVER say hello or re-introduce yourself. Continue naturally.`}\n2. CUSTOMER NAME: ${customerName ? `Known as \"${customerName}\". Use their name occasionally in replies to make it personal.` : `Unknown. If customer provides their name in this message, extract it and set the customerName field in your JSON output.`}\n3. Context: Budget=${budget||'not mentioned'}, Car Interest=${carInterest||'not mentioned'}, Stage=${bookingStage}\n4. SHORT replies (2-4 lines). Conversational. No bullet points unless listing cars.\n5. Respond in same language as customer (Hindi/Hinglish/English).\n6. ${isPureGreeting && !isFirstMessage ? `Mid-conversation greeting. Respond warmly and naturally (e.g. \"Hey! What can I help you with?\"). Do NOT re-introduce yourself. Return booking: {\"car\":null,\"date\":null,\"time\":null} and stage: \"other\".` : `Continue naturally based on context.`}\n\nINVENTORY:\nWe are a multi-brand dealership stocking ALL popular cars available in India across every segment and brand - Maruti Suzuki, Hyundai, Tata, Honda, Kia, Toyota, Mahindra, MG, Skoda, Volkswagen, Renault, Nissan, Jeep, Citroen, Isuzu, BYD, BMW, Audi, Mercedes-Benz, Volvo, and more. New and used cars both available.\n\nPRICE RANGES BY SEGMENT:\n- Hatchbacks: ?3.5L-11L (Alto, Swift, i20, Altroz, Baleno, Wagon R, Tiago, Kwid etc.)\n- Micro SUVs: ?6L-15L (Punch, Magnite, Kiger, XUV 3XO etc.)\n- Sedans: ?6.5L-19L (Dzire, City, Verna, Amaze, Slavia, Virtus etc.)\n- Compact SUVs: ?8L-22L (Nexon, Brezza, Venue, Sonet, Elevate, Kushaq, Taigun, Compass etc.)\n- Mid SUVs: ?11L-25L (Creta, Seltos, Alcazar, Hector, Astor, Grand Vitara etc.)\n- Large SUVs: ?13L-40L (Harrier, Safari, Scorpio N, Thar, Fortuner, Tucson etc.)\n- MPVs: ?6L-30L (Ertiga, Carens, Innova Crysta, Innova HyCross, XL6, Triber etc.)\n- Electric: ?7L-65L+ (Tiago EV, Punch EV, Nexon EV, Windsor EV, ZS EV, Ioniq 5, EV6, BYD Atto 3 etc.)\n- Luxury: ?45L-2Cr+ (BMW, Audi, Mercedes, Volvo, Jaguar, Porsche etc.)\n- Used Cars: Starting ?2L\n\nINVENTORY RULE: Since we stock all popular Indian cars, NEVER say a car is unavailable unless it is not sold in India at all. Use your knowledge of Indian car prices and variants to answer accurately. EMI, exchange, and insurance available on all cars.\n\nBOOKING RULES:\n6. Set booking.car, booking.date, booking.time to non-null ONLY when customer provides ALL THREE in their CURRENT message - car model + specific date (DD-MM-YYYY) + time slot.\n7. When customer agrees to test drive ? ask: \"Perfect! What date works for you, and what time? We're available any time between 9am-9pm ??\"\n8. When customer gives relative date (tomorrow, next Monday etc.) ? calculate exact date from today (${todayStr}) and confirm.\n9. CONFIRMATION: Any affirmative response counts as YES - yes, haan, ok, sure, absolutely, correct, right, exactly, perfect, definitely, of course, bilkul, theek hai, yep, yup, ha.\n10. booking.date must ALWAYS be in DD-MM-YYYY format.\n11. If date is in the past ? say \"That date has passed! Could you pick a future date? ??\"\n\nSTATUS & REPEAT SCENARIOS:\n12. Status questions ? use LAST CONFIRMED BOOKING info to answer.\n13. Cancel request ? say \"I'll have our team cancel your booking. They'll contact you shortly.\"\n14. Reschedule request ? ask for new date/time only.\n\nCUSTOMER HANDLING:\n15. Angry/frustrated ? \"I completely understand your frustration, and I'm sorry for the inconvenience. ??\"\n16. Off-topic ? \"Ha ha! I wish I could help with that ?? But I'm your car expert!\"\n17. Budget under ?3L ? suggest used cars starting ?2L.\n18. NEVER say \"Let me check\" or \"I'll look up\" - answer confidently.\n19. Business hours 9am-9pm. Outside hours ? ask for a slot between 9am-9pm.\n\nOUTPUT RULES - CRITICAL:\n- Return valid JSON only. No extra text.\n- Format: {\"message\":\"reply here\",\"stage\":\"initial|qualification|recommendation|booking|confirmed|other\",\"booking\":{\"car\":null,\"date\":null,\"time\":null},\"customerName\":null}\n- customerName: set to the customer's name (string) if they mentioned it in this message, otherwise null. Never guess.\n- stage = \"confirmed\" ONLY when setting all three booking fields to non-null.\n- booking.time format: \"9am\", \"10am\", \"11am\", \"12pm\", \"1pm\" etc. NEVER 24-hour format.\n- For ALL other messages booking must be: {\"car\":null,\"date\":null,\"time\":null}`;\n\nconst messages = [{ role: 'system', content: systemPrompt }];\nfor (const msg of history) {\n  messages.push({ role: msg.role === 'assistant' ? 'assistant' : 'user', content: msg.message });\n}\nmessages.push({ role: 'user', content: currentMessage });\n\nconst groqKeys = [\n  \"GROQ_KEY_1\",\n  \"GROQ_KEY_2\",\n  \"GROQ_KEY_3\",\n  \"GROQ_KEY_4\",\n  \"GROQ_KEY_5\"\n];\nconst groqKey = groqKeys[Math.floor(Math.random() * groqKeys.length)];\n\nreturn [{\n  json: {\n    groqKey,\n    body: {\n      model: \"llama-3.3-70b-versatile\",\n      messages: messages,\n      temperature: 0.3,\n      max_tokens: 500,\n      response_format: { type: \"json_object\" }\n    }\n  }\n}];"
         },
         "id": "3af2f09b-42d7-4739-9da2-c88ddd595eea",
         "name": "Build Groq Request",
@@ -1310,18 +1295,18 @@
     "autosaved": false,
     "workflowPublishHistory": [
       {
-        "createdAt": "2026-07-01T09:41:40.930Z",
-        "id": 100,
+        "createdAt": "2026-07-01T09:51:45.038Z",
+        "id": 106,
         "workflowId": "KpQWF3OSLckjAbCt",
-        "versionId": "8eb42eb3-2b22-431b-922d-be5e66637aae",
+        "versionId": "7d31649e-b5a3-48d2-9a79-23fd7e642bb9",
         "event": "activated",
         "userId": "9a3a38c6-7295-436e-9d84-f0ce111a1dba"
       },
       {
-        "createdAt": "2026-07-01T09:41:40.742Z",
-        "id": 99,
+        "createdAt": "2026-07-01T09:51:44.930Z",
+        "id": 105,
         "workflowId": "KpQWF3OSLckjAbCt",
-        "versionId": "8eb42eb3-2b22-431b-922d-be5e66637aae",
+        "versionId": "7d31649e-b5a3-48d2-9a79-23fd7e642bb9",
         "event": "deactivated",
         "userId": "9a3a38c6-7295-436e-9d84-f0ce111a1dba"
       }
